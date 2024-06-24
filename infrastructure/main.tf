@@ -206,9 +206,5 @@ resource "aws_elastic_beanstalk_environment" "crs-elastic-beanstalk-env" {
 }
 
 resource "aws_s3_bucket" "crs-documents-20240403" {
-  bucket = "crs-documents-20240403"
-}
-
-resource "aws_s3_bucket" "crs-documents-20240403" {
   bucket = "mers.projects.bbdgrad.com"
 }
