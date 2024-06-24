@@ -145,7 +145,7 @@ resource "aws_elastic_beanstalk_application" "crs-beanstalk-app" {
 resource "aws_elastic_beanstalk_environment" "crs-elastic-beanstalk-env" {
   name                = "crs-elastic-beanstalk-env"
   application         = aws_elastic_beanstalk_application.crs-beanstalk-app.name
-  solution_stack_name = "64bit Windows Server 2022 v2.14.1 running IIS 10.0"
+  solution_stack_name = "64bit Windows Server 2022 v2.15.2 running IIS 10.0"
   cname_prefix        = "crs-app"
 
   setting {
