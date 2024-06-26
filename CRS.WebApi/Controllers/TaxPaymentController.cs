@@ -26,6 +26,7 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Creates a tax payment record and sends back an invoice")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxInvoice))]
         [SwaggerResponse(StatusCodes.Status409Conflict)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("createTaxInvoice")]
         public IActionResult CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
