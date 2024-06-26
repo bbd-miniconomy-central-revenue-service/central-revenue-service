@@ -5,8 +5,7 @@ using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
