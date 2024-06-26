@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
-namespace CRS.WebApi.Models
+namespace CRS.WebApi.Data
 {
     public class RegisterBusinessRequest
     {

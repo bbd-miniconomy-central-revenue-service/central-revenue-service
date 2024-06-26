@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
+using CRS.WebApi.Data;
 
 namespace CRS.WebApi.Controllers
 {

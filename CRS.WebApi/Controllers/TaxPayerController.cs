@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
+using CRS.WebApi.Data;
 
 namespace CRS.WebApi.Controllers
 {
@@ -52,7 +53,7 @@ namespace CRS.WebApi.Controllers
         }
 
         // POST: api/taxPayer/business/register
-        [SwaggerOperation(Summary = "Registers a business and assigns it a tax number.")]
+        [SwaggerOperation(Summary = "Registers a business and assigns it a taxID.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict)]
         [HttpPost("business/register")]

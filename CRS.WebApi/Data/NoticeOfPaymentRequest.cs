@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace CRS.WebApi.Models
+namespace CRS.WebApi.Data
 {
     public class NoticeOfPaymentRequest
     {

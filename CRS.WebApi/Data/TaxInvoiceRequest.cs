@@ -1,8 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace CRS.WebApi.Models
+namespace CRS.WebApi.Data
 {
+    public enum TaxType 
+    {
+        INCOME,
+        VAT,
+        PROPERTY,
+        STOCK
+    }
     public class TaxInvoiceRequest
     {
         [Required]
@@ -11,7 +18,8 @@ namespace CRS.WebApi.Models
 
         [Required]
         [JsonPropertyName("taxType")]
-        public required string TaxType { get; set; }
+        [EnumDataType(typeof(TaxType))]
+        public required TaxType TaxType { get; set; }
 
         [Required]
         [JsonPropertyName("amount")]

@@ -1,11 +1,12 @@
 using CRS.WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddMvc().AddNewtonsoftJson();
+builder.Services.AddMvc().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
@@ -18,6 +19,7 @@ builder.Services.AddSwaggerGen(
         c.EnableAnnotations();
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
     });
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
 
