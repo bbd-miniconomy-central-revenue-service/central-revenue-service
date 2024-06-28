@@ -2,7 +2,7 @@ name: Deploy to Elastic Beanstalk
 on:
   push:
     branches:
-      - main
+      - feat/api-scaffolding
 
 env:
   AWS_REGION: "us-east-1"
@@ -38,7 +38,7 @@ jobs:
 
       - name: Install EF Core CLI
         run: dotnet tool install dotnet-ef --global
-  
+
       - name: Update database
         run: |
           dotnet ef database update --context CrsdbContext --connection ${{ secrets.DB_CONNECTION_STRING }} || exit 1
