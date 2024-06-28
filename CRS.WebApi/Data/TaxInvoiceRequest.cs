@@ -7,8 +7,7 @@ namespace CRS.WebApi.Data
     {
         INCOME,
         VAT,
-        PROPERTY,
-        STOCK
+        PROPERTY
     }
     public class TaxInvoiceRequest
     {
@@ -24,6 +23,5 @@ namespace CRS.WebApi.Data
         [Required]
         [JsonPropertyName("amount")]
         public required decimal Amount { get; set; }
-
     }
 }

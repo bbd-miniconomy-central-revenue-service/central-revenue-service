@@ -32,7 +32,7 @@ public partial class CrsdbContext : DbContext
     {
         modelBuilder.Entity<TaxPayer>(entity =>
         {
-            entity.HasKey(e => e.TaxPayerId).HasName("PK_TaxPayerId");
+            entity.HasKey(e => e.Id).HasName("PK_TaxPayerId");
 
             entity.ToTable("TaxPayer", tb => tb.HasTrigger("trgAfterUpdate"));
 

@@ -12,5 +12,9 @@ namespace CRS.WebApi.Data
         [Required]
         [JsonPropertyName("paymentId")]
         public required int PaymentId { get; set; }
+
+        [Required]
+        [JsonPropertyName("callbackURL")]
+        public required string CallbackURL {  get; set; }
     }
 }
