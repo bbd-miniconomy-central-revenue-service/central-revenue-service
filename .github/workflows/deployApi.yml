@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  build_and_create_Artifact:
+  deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -72,4 +72,4 @@ jobs:
 
       - name: Deploy new ElasticBeanstalk Application Version
         run: |
-          aws elasticbeanstalk update-environment --environment-name ${{ env.EBS_ENV }} --version-label "ver-${{ github.sha }}"  
+          aws elasticbeanstalk update-environment --environment-name ${{ env.EBS_ENV }} --version-label "ver-${{ github.sha }}"

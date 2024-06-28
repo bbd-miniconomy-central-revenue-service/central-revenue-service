@@ -14,30 +14,30 @@ permissions:
   contents: read
 
 jobs:
-    ConfigureAwsAndTerraform:
-        runs-on: ubuntu-latest
-        defaults:
-          run:
-            working-directory: infrastructure
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v2
+  ConfigureAwsAndTerraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
 
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                role-to-assume: ${{ secrets.AWS_ASSUME_ROLE }}
-                role-session-name: GitHub_to_AWS_via_FederatedOIDC
-                aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
 
-            - name: Check out terraform
-              uses: hashicorp/setup-terraform@v3
- 
-            - name: Terraform Init
-              run: terraform init
+      - name: Check out terraform
+        uses: hashicorp/setup-terraform@v3
 
-            - name: Terraform Plan
-              run: terraform plan
+      - name: Terraform Init
+        run: terraform init
 
-            - name: Terraform Apply
-              run: terraform apply -auto-approve
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
