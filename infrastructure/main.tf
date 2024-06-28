@@ -1,7 +1,7 @@
 # Create a VPC
 resource "aws_vpc" "crs_vpc" {
-  cidr_block = var.VPC_CIDR
-  enable_dns_support = true
+  cidr_block           = var.VPC_CIDR
+  enable_dns_support   = true
   enable_dns_hostnames = true
 }
 
@@ -22,14 +22,14 @@ resource "aws_route_table" "route_table" {
 
 # Create Subnets
 resource "aws_subnet" "subnet1" {
-  vpc_id     = aws_vpc.crs_vpc.id
-  cidr_block = var.PUB_SUB1_CIDR
+  vpc_id            = aws_vpc.crs_vpc.id
+  cidr_block        = var.PUB_SUB1_CIDR
   availability_zone = var.ZONE1
 }
 
 resource "aws_subnet" "subnet2" {
-  vpc_id     = aws_vpc.crs_vpc.id
-  cidr_block = var.PUB_SUB2_CIDR
+  vpc_id            = aws_vpc.crs_vpc.id
+  cidr_block        = var.PUB_SUB2_CIDR
   availability_zone = var.ZONE2
 }
 
@@ -42,7 +42,7 @@ resource "aws_route_table_association" "route_table_asso" {
 resource "aws_route_table_association" "route_table_asso1" {
   subnet_id      = aws_subnet.subnet2.id
   route_table_id = aws_route_table.route_table.id
-} 
+}
 
 # Create a security group
 resource "aws_security_group" "database_sg" {
@@ -108,33 +108,66 @@ resource "aws_security_group" "crs-instance-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    from_port        = 3389
+    to_port          = 3389
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
   tags = {
     Name = "Web-traffic"
   }
 }
 
 resource "aws_db_subnet_group" "sql_subnet_group" {
-    name       = "sqlsubgroup"
-    subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+  name       = "sqlsubgroup"
+  subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 
-    tags = {
-        Name = "SQL server subnet group"
-    }
+  tags = {
+    Name = "SQL server subnet group"
+  }
 }
 
 resource "aws_db_instance" "crs-rds" {
-  allocated_storage = 20
-  storage_type = "gp2"
-  engine = "sqlserver-ex"
-  instance_class = "db.t3.micro"
-  username = jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)["username"]
-  password = jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)["password"]
-  skip_final_snapshot = true // required to destroy
-  publicly_accessible= true
-  identifier = "crs"
-  multi_az = false
-  db_subnet_group_name = aws_db_subnet_group.sql_subnet_group.name
+  allocated_storage      = 20
+  storage_type           = "gp2"
+  engine                 = "sqlserver-ex"
+  instance_class         = "db.t3.micro"
+  username               = jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)["username"]
+  password               = jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)["password"]
+  skip_final_snapshot    = true // required to destroy
+  publicly_accessible    = true
+  identifier             = "crs"
+  multi_az               = false
+  db_subnet_group_name   = aws_db_subnet_group.sql_subnet_group.name
   vpc_security_group_ids = [aws_security_group.database_sg.id]
+}
+
+module "key_pair" {
+  source             = "terraform-aws-modules/key-pair/aws"
+  key_name           = "ebs-ec2-key"
+  create_private_key = true
+}
+
+resource "aws_secretsmanager_secret" "private_key" {
+  name = "private_key"
+}
+
+resource "aws_secretsmanager_secret_version" "private_key" {
+  secret_id     = aws_secretsmanager_secret.private_key.id
+  secret_string = <<EOF
+  {
+    "private_key_rfc1421" : "${module.key_pair.private_key_pem}",
+    "private_key_openssh" : "${module.key_pair.private_key_openssh}"
+  }
+  EOF
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_elastic_beanstalk_application" "crs-beanstalk-app" {
@@ -202,7 +235,17 @@ resource "aws_elastic_beanstalk_environment" "crs-elastic-beanstalk-env" {
     value     = "200"
   }
 
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "EC2KeyName"
+    value     = module.key_pair.key_pair_name
+  }
+
   depends_on = [aws_security_group.crs-instance-sg, aws_security_group.database_sg]
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_s3_bucket" "crs-documents-20240403" {
