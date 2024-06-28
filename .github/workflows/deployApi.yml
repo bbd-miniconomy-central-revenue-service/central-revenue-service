@@ -32,7 +32,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Run migrations
-        uses: ./github/workflows/migrations.yml
+        uses: ./.github/workflows/migrations.yml
 
       - name: Copy appsettings.json file
         run: aws s3 cp s3://crs-levelup-bucket/appsettings.Production.json .
