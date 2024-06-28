@@ -65,7 +65,7 @@ jobs:
           cd .. && zip ${{ github.workspace }}/bundle.zip site.zip aws-windows-deployment-manifest.json
 
       - name: Upload a Build Artifact
-        run: aws s3 cp bundle.zip s3://${{ env.AWS_BUCKET }}/
+        run: aws s3 cp ${{ github.workspace }}/bundle.zip s3://${{ env.AWS_BUCKET }}/
 
       - name: Create new ElasticBeanstalk Application Version
         run: |
