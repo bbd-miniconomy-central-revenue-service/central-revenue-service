@@ -38,10 +38,10 @@ jobs:
 
       - name: Install EF Core CLI
         run: dotnet tool install dotnet-ef --global
-  
+
       - name: Update database
         run: |
-          dotnet ef database update --context CrsdbContext --connection ${{ secrets.DB_CONNECTION_STRING }} || exit 1
+          dotnet ef database update --context CrsdbContext --connection "${{ secrets.DB_CONNECTION_STRING }}" || exit 1
 
       - name: Copy appsettings.json file
         run: aws s3 cp s3://crs-levelup-bucket/appsettings.Production.json .
@@ -60,11 +60,12 @@ jobs:
 
       - name: Zip Package
         run: |
-          zip -rj site.zip ../site/*
-          zip bundle.zip site.zip ../aws-windows-deployment-manifest.json
+          cd ../site
+          zip -r ../site.zip .
+          cd .. && zip ${{ github.workspace }}/bundle.zip site.zip aws-windows-deployment-manifest.json
 
       - name: Upload a Build Artifact
-        run: aws s3 cp bundle.zip s3://${{ env.AWS_BUCKET }}/
+        run: aws s3 cp ${{ github.workspace }}/bundle.zip s3://${{ env.AWS_BUCKET }}/
 
       - name: Create new ElasticBeanstalk Application Version
         run: |
