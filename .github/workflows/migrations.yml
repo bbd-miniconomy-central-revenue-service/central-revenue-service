@@ -1,0 +1,32 @@
+name: Database migrations
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "CRS.WebAPI/Migrations"
+  workflow_call:
+
+jobs:
+  migrate-db:
+    name: Run dotnet migrations
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: CRS.WebApi
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install .NET Core 8.0 latest
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.*
+
+      - name: Install EF Core CLI
+        run: dotnet tool install dotnet-ef --global
+
+      - name: Update database
+        run: |
+          dotnet ef database update --context CrsdbContext --connection ${{ secrets.DB_CONNECTION_STRING }} || exit 1
