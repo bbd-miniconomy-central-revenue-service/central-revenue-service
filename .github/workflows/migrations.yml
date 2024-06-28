@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - "CRS.WebAPI/Migrations"
+      - "CRS.WebAPI/Migrations/**"
   workflow_call:
 
 jobs:
