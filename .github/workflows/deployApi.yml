@@ -41,7 +41,7 @@ jobs:
 
       - name: Update database
         run: |
-          dotnet ef database update --context CrsdbContext --connection ${{ secrets.DB_CONNECTION_STRING }} || exit 1
+          dotnet ef database update --context CrsdbContext --connection "${{ secrets.DB_CONNECTION_STRING }}" || exit 1
 
       - name: Copy appsettings.json file
         run: aws s3 cp s3://crs-levelup-bucket/appsettings.Production.json .
