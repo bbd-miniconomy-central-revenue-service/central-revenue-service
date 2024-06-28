@@ -31,16 +31,20 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Run migrations
-        uses: ./.github/workflows/migrations.yml
-
-      - name: Copy appsettings.json file
-        run: aws s3 cp s3://crs-levelup-bucket/appsettings.Production.json .
-
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.*
+
+      - name: Install EF Core CLI
+        run: dotnet tool install dotnet-ef --global
+  
+      - name: Update database
+        run: |
+          dotnet ef database update --context CrsdbContext --connection ${{ secrets.DB_CONNECTION_STRING }} || exit 1
+
+      - name: Copy appsettings.json file
+        run: aws s3 cp s3://crs-levelup-bucket/appsettings.Production.json .
 
       - name: Install dependencies
         run: dotnet restore
