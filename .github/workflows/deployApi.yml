@@ -60,7 +60,7 @@ jobs:
 
       - name: Zip Package
         run: |
-          zip -rj site.zip ../site/*
+          zip -r site.zip ../site/*
           zip bundle.zip site.zip ../aws-windows-deployment-manifest.json
 
       - name: Upload a Build Artifact
