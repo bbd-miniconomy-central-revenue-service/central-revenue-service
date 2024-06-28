@@ -60,8 +60,9 @@ jobs:
 
       - name: Zip Package
         run: |
-          zip -r site.zip ../site/*
-          zip bundle.zip site.zip ../aws-windows-deployment-manifest.json
+          cd ../site
+          zip -r ../site.zip .
+          cd .. && zip ${{ github.workspace }}/bundle.zip site.zip aws-windows-deployment-manifest.json
 
       - name: Upload a Build Artifact
         run: aws s3 cp bundle.zip s3://${{ env.AWS_BUCKET }}/
