@@ -1,0 +1,45 @@
+.dashboard-container {
+    padding: 20px;
+  }
+  
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-box {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .filter-box.selected {
+    background-color: #3f51b5;
+    color: white;
+  }
+  
+  .dashboard-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .metric-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  @media (min-width: 960px) {
+    .dashboard-metrics {
+      flex-direction: row;
+    }
+  }
+  

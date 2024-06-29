@@ -1,0 +1,72 @@
+.search-container {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-box {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .filter-box.selected {
+    background-color: #3f51b5;
+    color: white;
+  }
+  
+  .results-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .result-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .result-avatar {
+    background-color: #e0e0e0;
+    border-radius: 50%;
+  }
+  
+  .result-avatar.individual {
+    background-color: #ff9800;
+  }
+  
+  .result-avatar.company {
+    background-color: #4caf50;
+  }
+  
+  .mat-card-title,
+  .mat-card-subtitle {
+    text-transform: capitalize;
+  }
+  
+  .paid {
+    background-color: #e0ffe0; /* Light green for paid */
+  }
+  
+  .in-arrears {
+    background-color: #ffe0e0; /* Light red for in arrears */
+  }
+  
+  mat-paginator {
+    margin-top: 10px;
+    align-self: center;
+  }
+  
