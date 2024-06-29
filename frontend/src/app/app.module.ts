@@ -16,14 +16,17 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SearchComponent } from './search/search.component';
 import { HomeComponent } from './home/home.component';
-import { AppRoutingModule } from './app-routing.module'; // Import AppRoutingModule
+import { AppRoutingModule } from './app-routing.module';
+import { LoginComponent } from './login/login.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     SearchComponent,
-    HomeComponent
+    HomeComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
