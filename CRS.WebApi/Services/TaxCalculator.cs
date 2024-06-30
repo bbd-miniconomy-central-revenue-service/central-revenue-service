@@ -2,7 +2,8 @@
 
 public class TaxCalculator
 {
-    private readonly decimal  taxRate = 0.16m;
+    //TODO: get rates from zues endpoint
+    private readonly double taxRate = 15;
     private static readonly Lazy<TaxCalculator> _lazyInstance = new Lazy<TaxCalculator>(() => new TaxCalculator());
 
         private TaxCalculator() { }
@@ -17,6 +18,7 @@ public class TaxCalculator
 
         public decimal CalculateTax(decimal amount, string taxType)
         {
-            return amount * taxRate;
+            ICalculator calculator = TaxCalculatorFactory.GetTaxCalculator(taxType);
+            return calculator.CalculateTax(amount, taxRate);
         }
 }
