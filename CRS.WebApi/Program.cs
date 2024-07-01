@@ -1,3 +1,4 @@
+using CRS.WebApi.Data;
 using CRS.WebApi.Models;
 using CRS.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,11 @@ builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
-    c =>
+    options =>
     {
-        c.EnableAnnotations();
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
+        options.EnableAnnotations();
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
+        options.DocumentFilter<CustomModelDocumentFilter<VerificationRequest>>();
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 

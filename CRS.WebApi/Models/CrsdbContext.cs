@@ -26,13 +26,13 @@ public partial class CrsdbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:LocalDB");
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:DbCon");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaxPayer>(entity =>
         {
-            entity.HasKey(e => e.TaxPayerId).HasName("PK_TaxPayerId");
+            entity.HasKey(e => e.Id).HasName("PK_TaxPayerId");
 
             entity.ToTable("TaxPayer", tb => tb.HasTrigger("trgAfterUpdate"));
 

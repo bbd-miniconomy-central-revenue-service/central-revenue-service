@@ -45,7 +45,7 @@ namespace CRS.WebApi.Controllers
         }
 
         // POST: api/taxPayment/submitNoticeOfPayment
-        [SwaggerOperation(Summary = "Verifies that payment has been made and updates the corresponding payment record")]
+        [SwaggerOperation(Summary = "Verifies that payment has been made and updates the corresponding payment record. A VerificationRequest is sent to the callback URL with the results.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(NoticeOfPaymentResponse))]
         [HttpPost("submitNoticeOfPayment")]
         public IActionResult SubmitNoticeOfPayment(NoticeOfPaymentRequest noticeOfPaymentRequest)

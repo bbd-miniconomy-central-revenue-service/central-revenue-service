@@ -483,11 +483,12 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-
 .vs
 .vscode
 site.zip
 site
 central-revenue-service.zip
+*.hcl
+.terraform
 .config
 nuget.config
