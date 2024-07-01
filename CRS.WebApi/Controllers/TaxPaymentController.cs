@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
+using CRS.WebApi.Services;
 
 namespace CRS.WebApi.Controllers
 {
@@ -16,10 +17,14 @@ namespace CRS.WebApi.Controllers
     public class TaxPaymentController : ControllerBase
     {
         private readonly CrsdbContext _context;
+        private readonly TaxCalculatorService _taxCalculator;
+        private readonly PaymentService _paymentService;
 
-        public TaxPaymentController(CrsdbContext context)
+        public TaxPaymentController(CrsdbContext context, TaxCalculatorService taxCalculator, PaymentService paymentService)
         {
             _context = context;
+            _taxCalculator = taxCalculator;
+            _paymentService = paymentService;
         }
 
         // POST: api/taxPayment/createTaxInvoice
@@ -30,18 +35,31 @@ namespace CRS.WebApi.Controllers
         [HttpPost("createTaxInvoice")]
         public IActionResult CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
-            return Ok(
-                new TaxInvoice
+            try
+            {
+                var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
+
+                var paymentId = _paymentService.CreatePayment(taxInvoiceRequest);
+
+                var taxInvoice = new TaxInvoice
                 {
-                    PaymentId = 2,
-                    AmountDue = 1200,
-                    DueTime = new DueTime {
+                    PaymentId = paymentId,
+                    AmountDue = tax,
+                    DueTime = new DueTime
+                    {
                         Days = 10,
                         Hours = 2,
                         Minutes = 2,
                         Seconds = 2
                     }
-                });
+                };
+
+                return Ok(taxInvoice);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
         }
 
         // POST: api/taxPayment/submitNoticeOfPayment

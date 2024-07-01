@@ -5,9 +5,9 @@ namespace CRS.WebApi.Data
 {
     public enum TaxType 
     {
-        INCOME,
-        VAT,
-        PROPERTY
+        INCOME = 1,
+        VAT = 2,
+        PROPERTY = 3
     }
     public class TaxInvoiceRequest
     {
