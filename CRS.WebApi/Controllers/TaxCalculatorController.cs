@@ -1,5 +1,4 @@
-﻿using CRS.WebApi.data;
-using CRS.WebApi.Data;
+﻿using CRS.WebApi.Data;
 using CRS.WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -23,7 +22,7 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpGet("calculate")]
-        public IActionResult CalculateTax(decimal amount, [FromQuery, SwaggerParameter(Description = "Type of tax", Required = true)]PossibleTaxTypes taxType)
+        public IActionResult CalculateTax(decimal amount, [FromQuery, SwaggerParameter(Description = "Type of tax", Required = true)]TaxType taxType)
         {
             var tax = _taxCalculator.CalculateTax(amount, taxType.ToString());
             return Ok(new { TaxableAmount = amount, TaxAmount = tax });

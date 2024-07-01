@@ -1,6 +1,6 @@
 ﻿namespace CRS.WebApi.Services;
 using CRS.WebApi.Models;
-using CRS.WebApi.data;
+using CRS.WebApi.Data;
 
 public class TaxCalculatorService
 {
@@ -14,6 +14,6 @@ public class TaxCalculatorService
     public decimal CalculateTax(decimal amount, string taxType)
     {
         ICalculator calculator = _taxCalculatorFactory.GetTaxCalculator(taxType);
-        return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(PossibleTaxTypes), taxType.ToUpper()));
+        return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(Data.TaxType), taxType.ToUpper()));
     }
 }
