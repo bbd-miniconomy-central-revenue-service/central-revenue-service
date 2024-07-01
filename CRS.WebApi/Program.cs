@@ -23,7 +23,9 @@ builder.Services.AddSwaggerGen(
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
-builder.Services.AddSingleton(TaxCalculator.Instance);
+builder.Services.AddScoped<TaxCalculatorFactory>();
+
+builder.Services.AddScoped<TaxCalculatorService>();
 
 var app = builder.Build();
 

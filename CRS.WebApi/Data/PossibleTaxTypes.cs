@@ -2,7 +2,7 @@
 
 public enum PossibleTaxTypes
 {
-    Income,
-    Property,
-    Vat
+    INCOME = 1,
+    PROPERTY = 2,
+    VAT = 3,
 }

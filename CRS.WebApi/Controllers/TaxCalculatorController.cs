@@ -10,6 +10,12 @@ namespace CRS.WebApi.Controllers
     [ApiController]
     public class TaxCalculatorController : ControllerBase
     {
+        private readonly TaxCalculatorService _taxCalculator;
+
+        public TaxCalculatorController(TaxCalculatorService taxCalculator)
+        {
+            _taxCalculator = taxCalculator;
+        }
         // GET: api/taxcalculator/calculate
         [SwaggerOperation(Summary = "Calculates specified tax on a provided amount")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxAmountResponse))]
@@ -19,7 +25,7 @@ namespace CRS.WebApi.Controllers
         [HttpGet("calculate")]
         public IActionResult CalculateTax(decimal amount, [FromQuery, SwaggerParameter(Description = "Type of tax", Required = true)]PossibleTaxTypes taxType)
         {
-            var tax = TaxCalculator.Instance.CalculateTax(amount, taxType.ToString());
+            var tax = _taxCalculator.CalculateTax(amount, taxType.ToString());
             return Ok(new { TaxableAmount = amount, TaxAmount = tax });
         }
     }   
