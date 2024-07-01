@@ -27,6 +27,8 @@ builder.Services.AddScoped<TaxCalculatorFactory>();
 
 builder.Services.AddScoped<TaxCalculatorService>();
 
+builder.Services.AddScoped<PaymentService>();
+
 var app = builder.Build();
 
 app.UseSwagger();
