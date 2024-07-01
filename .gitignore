@@ -489,3 +489,5 @@ $RECYCLE.BIN/
 site.zip
 site
 central-revenue-service.zip
+.config
+nuget.config
