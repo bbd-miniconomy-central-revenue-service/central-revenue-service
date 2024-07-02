@@ -4,19 +4,17 @@ using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using server.Models;
-using server.Models.Dtos;
-using server.Repositories;
+using CRS.WebApi.Models;
+using CRS.WebApi.Models.Dtos;
 using Task = System.Threading.Tasks.Task;
 
 namespace server.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     [AllowAnonymous]
-    public class AuthController(UserRepository userRepository) : ControllerBase
+    public class AuthController() : ControllerBase
     {
-        private static readonly string? UserPoolId = Environment.GetEnvironmentVariable("USERPOOL_ID");
         
         private static readonly string? ClientId = Environment.GetEnvironmentVariable("COGNITO_CLIENTID");
         private static readonly BasicAWSCredentials Credentials = new(Environment.GetEnvironmentVariable("AWS_ACCESS_ID"), Environment.GetEnvironmentVariable("AWS_ACCESS_SECRET"));
@@ -46,88 +44,6 @@ namespace server.Controllers
             catch (Exception e)
             {
                 return Unauthorized("Invalid username or password");
-            }
-        }
-
-        [HttpPost("signUp")]
-        public async Task<IActionResult> SignUp([FromBody] AuthSignUpDto authSignUpDto)
-        {
-            var signUpRequest = new SignUpRequest
-            {
-                ClientId = ClientId,
-                Username = authSignUpDto.username,
-                Password = authSignUpDto.password,
-                UserAttributes =
-                [
-                    new AttributeType
-                    {
-                        Name = "email",
-                        Value = authSignUpDto.username
-                    }
-                ]
-            };
- 
-            try
-            {
-                var signUpResponse = await _provider.SignUpAsync(signUpRequest);
-                await AddUserToGroup(authSignUpDto.username, "user");
-                Console.WriteLine("Sign up successful");
-                return Ok("User signed up successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error signing up: {ex.Message}");
-                return BadRequest("Failed to Create User");
-            }
-        }
-
-        [HttpPost("confirmSignup")]
-        public async Task<IActionResult> ConfirmSignUp([FromBody] AuthConfirmSignUpDto authConfirmSignUpDto)
-        {
-            var confirmSignUpRequest = new ConfirmSignUpRequest
-            {
-                ClientId = ClientId,
-                Username = authConfirmSignUpDto.username,
-                ConfirmationCode = authConfirmSignUpDto.code
-            };
- 
-            try
-            {
-                await _provider.ConfirmSignUpAsync(confirmSignUpRequest);
-                Console.WriteLine("User confirmed successfully");
-                var user = new User()
-                {
-                    Email = authConfirmSignUpDto.username
-                };
-                await userRepository.Create(user);
-                return Ok("User has been confirmed");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error confirming sign up: {ex.Message}");
-                return BadRequest("Could not confirm user");
-            }
-        }
-        
-
-        private async Task AddUserToGroup(string email, string role)
-        {
-            var addUserToGroupRequest = new AdminAddUserToGroupRequest
-            {
-                GroupName = role,
-                UserPoolId = UserPoolId,
-                Username = email
-            };
- 
-            try
-            {
-                await _provider.AdminAddUserToGroupAsync(addUserToGroupRequest);
-                Console.WriteLine($"User added to group {role}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw;
             }
         }
     }

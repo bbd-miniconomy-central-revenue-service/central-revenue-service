@@ -19,7 +19,7 @@ export class LoginComponent {
 
   handleSignIn(event: Event) {
     event.preventDefault();
-    this.http.post<any>(`${environment.apiUrl}/api/v1/Auth/signIn`, {
+    this.http.post<any>(`${environment.apiUrl}/api/auth/signIn`, {
       username: this.email,
       password: this.password
     }).subscribe(response => {
@@ -36,22 +36,6 @@ export class LoginComponent {
       }
     }, error => {
       alert(`Sign in failed: ${error}`);
-    });
-  }
-
-  handleSignUp(event: Event) {
-    event.preventDefault();
-    if (this.password !== this.confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    this.http.post<any>(`${environment.apiUrl}/api/v1/Auth/signUp`, {
-      username: this.email,
-      password: this.password
-    }).subscribe(() => {
-      this.router.navigate(['/confirm'], { state: { email: this.email } });
-    }, error => {
-      alert(`Sign up failed: ${error}`);
     });
   }
 }

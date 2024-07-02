@@ -1,4 +1,4 @@
-﻿namespace server.Models.Dtos;
+﻿namespace CRS.WebApi.Models.Dtos;
 
 public class JwtDto
 {

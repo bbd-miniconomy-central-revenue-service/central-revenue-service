@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-namespace server.Jwt;
+namespace CRS.WebApi.Jwt;
 
 public static class JwtUtils
 {
