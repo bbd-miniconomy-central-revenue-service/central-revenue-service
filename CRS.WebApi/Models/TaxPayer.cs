@@ -10,11 +10,11 @@ namespace CRS.WebApi.Models;
 public partial class TaxPayer
 {
     [Key]
-    [Column("id")]
-    public int Id { get; set; }
+    [Column("id", TypeName = "bigint")]
+    public long Id { get; set; }
 
-    [Column("personaId")]
-    public int? PersonaId { get; set; }
+    [Column("personaId", TypeName = "bigint")]
+    public long? PersonaId { get; set; }
 
     [Column("taxPayerID")]
     public Guid TaxPayerId { get; set; }
@@ -26,6 +26,9 @@ public partial class TaxPayer
 
     [Column("group")]
     public int Group { get; set; }
+
+    [Column("simulationId")]
+    public int SimulationId { get; set; }
 
     [Column("status")]
     public int Status { get; set; }
@@ -47,6 +50,10 @@ public partial class TaxPayer
     [InverseProperty("TaxPayers")]
     public virtual TaxStatus StatusNavigation { get; set; } = null!;
 
+    [ForeignKey("SimulationId")]
+    [InverseProperty("TaxPayers")]
+    public virtual Simulation SimulationNavigation { get; set; } = null!;
+
     [InverseProperty("TaxPayer")]
-    public virtual ICollection<TaxPayment> TaxPayments { get; set; } = new List<TaxPayment>();
+    public virtual ICollection<TaxPayment> TaxPayments { get; set; } = [];
 }

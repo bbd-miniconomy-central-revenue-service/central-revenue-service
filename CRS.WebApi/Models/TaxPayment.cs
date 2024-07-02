@@ -10,11 +10,11 @@ namespace CRS.WebApi.Models;
 public partial class TaxPayment
 {
     [Key]
-    [Column("id")]
-    public int Id { get; set; }
+    [Column("id", TypeName = "bigint")]
+    public long Id { get; set; }
 
-    [Column("taxPayerID")]
-    public int TaxPayerId { get; set; }
+    [Column("taxPayerID", TypeName = "bigint")]
+    public long TaxPayerId { get; set; }
 
     [Column("amount", TypeName = "money")]
     public decimal Amount { get; set; }

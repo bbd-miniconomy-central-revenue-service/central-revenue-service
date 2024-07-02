@@ -23,5 +23,5 @@ public partial class TaxType
     public decimal Rate { get; set; }
 
     [InverseProperty("TaxTypeNavigation")]
-    public virtual ICollection<TaxPayment> TaxPayments { get; set; } = new List<TaxPayment>();
+    public virtual ICollection<TaxPayment> TaxPayments { get; set; } = [];
 }
