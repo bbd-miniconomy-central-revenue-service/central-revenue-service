@@ -6,6 +6,30 @@ using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opts =>
+    {
+        var userPoolId = Environment.GetEnvironmentVariable("USERPOOL_ID")!;
+        opts.Authority = $"https://cognito-idp.eu-west-1.amazonaws.com/{userPoolId}";
+        opts.MetadataAddress = $"https://cognito-idp.eu-west-1.amazonaws.com/{userPoolId}/.well-known/openid-configuration";
+        opts.IncludeErrorDetails = true;
+        opts.RequireHttpsMetadata = false;
+        opts.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            RoleClaimType = "cognito:groups"
+        };
+    });
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("admin", policy => policy.RequireClaim("cognito:groups", "admin"));
+    options.AddPolicy("user", policy => policy.RequireClaim("cognito:groups", "user"));
+});
+
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
