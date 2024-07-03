@@ -24,6 +24,8 @@ public partial class CrsdbContext : DbContext
     public virtual DbSet<TaxType> TaxTypes { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    
+    public virtual DbSet<TaxRecordViewModel> TaxRecordView { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Name=ConnectionStrings:DBCon");
@@ -88,6 +90,11 @@ public partial class CrsdbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_UserId");
 
             entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<TaxRecordViewModel>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_UserId");
         });
 
         OnModelCreatingPartial(modelBuilder);
