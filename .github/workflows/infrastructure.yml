@@ -3,11 +3,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "infrastructure/**"
 
 env:
   AWS_REGION: "us-east-1"
+  AWS_BUCKET: "mers.projects.bbdgrad.com"
 
 permissions:
   id-token: write

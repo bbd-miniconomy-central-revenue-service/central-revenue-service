@@ -1,6 +1,7 @@
 using CRS.WebApi.Data;
 using CRS.WebApi.Models;
 using CRS.WebApi.Repositories;
+using CRS.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
@@ -23,6 +24,12 @@ builder.Services.AddSwaggerGen(
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 builder.Services.AddScoped<UnitOfWork>();
+
+builder.Services.AddScoped<TaxCalculatorFactory>();
+
+builder.Services.AddScoped<TaxCalculatorService>();
+
+builder.Services.AddScoped<PaymentService>();
 
 var app = builder.Build();
 
