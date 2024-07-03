@@ -62,6 +62,7 @@ builder.Services.AddSwaggerGen(
         options.EnableAnnotations();
         options.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
         options.DocumentFilter<CustomModelDocumentFilter<VerificationRequest>>();
+        options.OperationFilter<CustomOperationFilter>();
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
@@ -74,6 +75,13 @@ builder.Services.AddScoped<IScopedProcessingService, DefaultScopedProcessingServ
 builder.Services.AddScoped<TaxCalculatorFactory>();
 
 builder.Services.AddScoped<TaxCalculatorService>();
+
+IConfiguration config = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", false, false)
+    .AddJsonFile($"appsettings.Production.json", true, true)
+    .AddEnvironmentVariables()
+    .Build();
 
 builder.Services.AddHttpClient<HandOfZeusService>();
 builder.Services.AddHttpClient<PersonaService>();

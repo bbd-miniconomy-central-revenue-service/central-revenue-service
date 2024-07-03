@@ -495,3 +495,6 @@ central-revenue-service.zip
 *.pfx
 .config
 nuget.config
+*.crt
+*.key
+*.pfx
