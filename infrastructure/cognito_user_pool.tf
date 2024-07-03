@@ -57,6 +57,10 @@ resource "aws_cognito_user_pool" "RevenueServiceUserPool" {
   verification_message_template {
     default_email_option = "CONFIRM_WITH_CODE"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_cognito_user_pool_client" "RevenueService" {
