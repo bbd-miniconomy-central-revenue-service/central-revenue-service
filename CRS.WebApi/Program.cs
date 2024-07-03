@@ -35,8 +35,6 @@ builder.Services.AddScoped<TaxCalculatorFactory>();
 
 builder.Services.AddScoped<TaxCalculatorService>();
 
-builder.Services.AddScoped<PaymentService>();
-
 IConfiguration config = new ConfigurationBuilder()
                           .SetBasePath(Directory.GetCurrentDirectory())
                           .AddJsonFile("appsettings.json", false, false)

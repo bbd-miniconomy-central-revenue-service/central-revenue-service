@@ -18,7 +18,7 @@ namespace CRS.WebApi.Controllers
 
         // GET: api/records/history
         [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet("/history")]
+        [HttpGet("history")]
         public async Task<ActionResult<TaxRecordsResponse>> GetTaxHistory()
         {
             try 
