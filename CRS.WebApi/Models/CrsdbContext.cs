@@ -26,7 +26,7 @@ public partial class CrsdbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:DbCon");
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:DBCon");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
