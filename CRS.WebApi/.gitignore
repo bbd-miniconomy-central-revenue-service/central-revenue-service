@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 
 Properties
 appsettings.Production.json
+
+Migrations/*_Seed.cs
+Migrations/*_Seed.Designer.cs

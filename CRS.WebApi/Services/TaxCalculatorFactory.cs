@@ -10,17 +10,13 @@ public class TaxCalculatorFactory
 
     public ICalculator GetTaxCalculator(string taxType)
     {
-        switch (taxType.ToLower())
+        return taxType.ToLower() switch
         {
-            case "property":
-                return new PropertyTaxCalculator(_context);
-            case "income":
-                return new IncomeTaxCalculator(_context);
-            case "vat":
-                return new VatCalculator(_context);
-            default:
-                throw new ArgumentException("Invalid tax type");
-        }
+            "property" => new PropertyTaxCalculator(_context),
+            "income" => new IncomeTaxCalculator(_context),
+            "vat" => new VatCalculator(_context),
+            _ => throw new ArgumentException("Invalid tax type"),
+        };
     }
 
 }

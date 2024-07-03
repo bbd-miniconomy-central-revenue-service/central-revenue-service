@@ -18,12 +18,7 @@
         public decimal CalculateTaxWithRateFromDb(decimal amount, int taxTypeId)
         {
             var taxType = _context.TaxTypes.Find(taxTypeId);
-            if (taxType == null)
-            {
-                throw new Exception("TaxType not found.");
-            }
-
-            return CalculateTax(amount, taxType.Rate);
+            return taxType == null ? throw new Exception("TaxType not found.") : CalculateTax(amount, taxType.Rate);
         }
     }
 }

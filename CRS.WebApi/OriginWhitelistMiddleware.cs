@@ -16,9 +16,9 @@ public class OriginWhitelistMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var origin = context.Request.Headers["Origin"].FirstOrDefault();
+        var origin = context.Request.Headers["X-Origin"].FirstOrDefault();
 
-        if (origin != null && !_whitelistedOrigins.Contains(origin))
+        if (origin == null || (origin != null && !_whitelistedOrigins.Contains(origin)))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("Not authorized.");

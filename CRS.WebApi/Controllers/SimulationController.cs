@@ -14,31 +14,49 @@ namespace CRS.WebApi.Controllers
 {
     [Route("api/simulation")]
     [ApiController]
-    public class SimluationController(UnitOfWork unitOfWork) : ControllerBase
+    public class SimluationController(UnitOfWork unitOfWork, PersonaService personaService) : ControllerBase
     {
         private readonly UnitOfWork _unitOfWork = unitOfWork;
+        private readonly PersonaService _personaService = personaService;
 
         // POST: api/simulation/startNewSimulation
         [SwaggerOperation(Summary = "API endpoint to start a new simulation")]
-        [SwaggerResponse(StatusCodes.Status200OK)]
-        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status204NoContent)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpPost("startNewSimulation")]
-        public IActionResult startNewSimulation(StartSimulationRequest startSimulationRequest)
+        public async Task<IActionResult> StartNewSimulation(StartSimulationRequest startSimulationRequest)
         {
-            if (startSimulationRequest.Action == Data.Action.start) {
-                _unitOfWork.SimulationRepository.Create(    
-                    new Simulation
-                    {
-                        StartTime = DateTime.Parse(startSimulationRequest.StartTime!),
-                    });
-            } 
-            else
-            {
-                // TODO: truncate all the tables
-                return NoContent();
+            var simulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+
+            if (startSimulationRequest.Action == Data.Action.start || simulation == null) {
+                simulation = new Simulation
+                {
+                    StartTime = DateTime.Parse(startSimulationRequest.StartTime!),
+                };
+
+                _unitOfWork.SimulationRepository.Create(simulation);
             }
 
-            _unitOfWork.Save();
+            _unitOfWork.TaxPaymentRepository.DeleteAll();
+            _unitOfWork.TaxPayerRepository.DeleteAll();
+
+            var personas = await _personaService.GetPersonaList();
+
+            if (startSimulationRequest.Action == Data.Action.start)
+            {
+                foreach (var persona in personas)
+                {
+                    _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                    {
+                        PersonaId = persona.Id,
+                        SimulationId = simulation.Id,
+                        AmountOwing = 0,
+                        Group = (int)Data.TaxPayerType.INDIVIDUAL,
+                    });
+                }
+
+                _unitOfWork.Save();
+            }
 
             return NoContent();
         }
