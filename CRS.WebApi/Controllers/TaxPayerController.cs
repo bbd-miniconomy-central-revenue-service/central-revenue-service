@@ -58,8 +58,21 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict)]
         [HttpPost("business/register")]
-        public ActionResult<TaxIdResponse> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
+        public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
+            var latestSimulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+            var newTaxPayer = new TaxPayer
+            {
+                Name = registerBusinessRequest.BusinessName,
+                Group = (int)Data.TaxPayerType.BUSINESS,
+                Status = (int)Data.TaxStatus.ACTIVE,
+                AmountOwing = 0,
+                SimulationId = latestSimulation.Id
+            };
+            
+            _unitOfWork.TaxPayerRepository.Create(newTaxPayer);
+            _unitOfWork.Save();
+
             return Ok(
                 new TaxIdResponse
                 {

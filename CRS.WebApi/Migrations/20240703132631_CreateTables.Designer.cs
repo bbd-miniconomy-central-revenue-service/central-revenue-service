@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    [Migration("20240626072457_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240703132631_CreateTables")]
+    partial class CreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace CRS.WebApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CRS.WebApi.Models.TaxPayer", b =>
+            modelBuilder.Entity("CRS.WebApi.Models.Simulation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,6 +33,24 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("startTime");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Simulation");
+                });
+
+            modelBuilder.Entity("CRS.WebApi.Models.TaxPayer", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("AmountOwing")
                         .HasColumnType("money")
@@ -54,9 +72,13 @@ namespace CRS.WebApi.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("name");
 
-                    b.Property<int?>("PersonaId")
-                        .HasColumnType("int")
+                    b.Property<long?>("PersonaId")
+                        .HasColumnType("bigint")
                         .HasColumnName("personaId");
+
+                    b.Property<int>("SimulationId")
+                        .HasColumnType("int")
+                        .HasColumnName("simulationId");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")
@@ -78,6 +100,8 @@ namespace CRS.WebApi.Migrations
                         .HasName("PK_TaxPayerId");
 
                     b.HasIndex("Group");
+
+                    b.HasIndex("SimulationId");
 
                     b.HasIndex("Status");
 
@@ -119,12 +143,12 @@ namespace CRS.WebApi.Migrations
 
             modelBuilder.Entity("CRS.WebApi.Models.TaxPayment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("money")
@@ -136,8 +160,8 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("created")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<int>("TaxPayerId")
-                        .HasColumnType("int")
+                    b.Property<long>("TaxPayerId")
+                        .HasColumnType("bigint")
                         .HasColumnName("taxPayerID");
 
                     b.Property<int>("TaxType")
@@ -247,6 +271,12 @@ namespace CRS.WebApi.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_TaxPayer_TaxPyerType");
 
+                    b.HasOne("CRS.WebApi.Models.Simulation", "SimulationNavigation")
+                        .WithMany("TaxPayers")
+                        .HasForeignKey("SimulationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CRS.WebApi.Models.TaxStatus", "StatusNavigation")
                         .WithMany("TaxPayers")
                         .HasForeignKey("Status")
@@ -254,6 +284,8 @@ namespace CRS.WebApi.Migrations
                         .HasConstraintName("FK_TaxPayer_TaxStatus");
 
                     b.Navigation("GroupNavigation");
+
+                    b.Navigation("SimulationNavigation");
 
                     b.Navigation("StatusNavigation");
                 });
@@ -275,6 +307,11 @@ namespace CRS.WebApi.Migrations
                     b.Navigation("TaxPayer");
 
                     b.Navigation("TaxTypeNavigation");
+                });
+
+            modelBuilder.Entity("CRS.WebApi.Models.Simulation", b =>
+                {
+                    b.Navigation("TaxPayers");
                 });
 
             modelBuilder.Entity("CRS.WebApi.Models.TaxPayer", b =>
