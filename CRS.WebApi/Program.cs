@@ -1,5 +1,6 @@
 using CRS.WebApi.Data;
 using CRS.WebApi.Models;
+using CRS.WebApi.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
@@ -18,9 +19,10 @@ builder.Services.AddSwaggerGen(
     {
         options.EnableAnnotations();
         options.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
-        options.DocumentFilter<CustomModelDocumentFilter<VerificationRequest>>();
+        options.DocumentFilter<CustomModelDocumentFilter<Enums>>();
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
+builder.Services.AddScoped<UnitOfWork>();
 
 var app = builder.Build();
 

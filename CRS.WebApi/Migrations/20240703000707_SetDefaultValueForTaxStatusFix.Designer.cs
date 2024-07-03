@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    [Migration("20240702013614_AddedSimulationTableAndUpdatedColumnDTypes")]
-    partial class AddedSimulationTableAndUpdatedColumnDTypes
+    [Migration("20240703000707_SetDefaultValueForTaxStatusFix")]
+    partial class SetDefaultValueForTaxStatusFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,6 +81,7 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("simulationId");
 
                     b.Property<int>("Status")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int")
                         .HasColumnName("status");
 
