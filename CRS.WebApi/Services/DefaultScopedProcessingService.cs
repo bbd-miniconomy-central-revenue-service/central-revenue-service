@@ -17,8 +17,14 @@ public sealed class DefaultScopedProcessingService(
 
     public async Task DoWorkAsync(CancellationToken stoppingToken)
     {
-        await UpdateTaxRates();
         await UpdateSimulation();
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            await UpdateTaxRates();
+
+            await Task.Delay(60_0000 * 2, stoppingToken);
+        }
     }
 
     public async Task UpdateTaxRates()
@@ -70,13 +76,17 @@ public sealed class DefaultScopedProcessingService(
 
                 foreach (var persona in personas)
                 {
-                    _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                    if (persona.Adult)
                     {
-                        PersonaId = persona.Id,
-                        SimulationId = simulation.Id,
-                        AmountOwing = 0,
-                        Group = (int)Data.TaxPayerType.INDIVIDUAL,
-                    });
+                        _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                        {
+                            PersonaId = persona.Id,
+                            SimulationId = simulation.Id,
+                            AmountOwing = 0,
+                            Group = (int)Data.TaxPayerType.INDIVIDUAL,
+                            Status = (int)Data.TaxStatus.INACTIVE
+                        });
+                    }
                 }
 
                 _unitOfWork.Save();

@@ -47,7 +47,6 @@ namespace CRS.WebApi.Controllers
                         TaxPayerId = taxpayer.Id,  
                         Amount = taxInvoiceRequest.Amount,
                         TaxType = (int)taxInvoiceRequest.TaxType,
-                        Created = DateTime.UtcNow 
                     };
 
                     _unitOfWork.TaxPaymentRepository.Create(taxPayment);
@@ -57,13 +56,6 @@ namespace CRS.WebApi.Controllers
                     {
                         PaymentId = taxPayment.Id,
                         AmountDue = tax,
-                        DueTime = new DueTime
-                        {
-                            Days = 10,
-                            Hours = 2,
-                            Minutes = 2,
-                            Seconds = 2
-                        }
                     };
 
                     return Ok(taxInvoice);

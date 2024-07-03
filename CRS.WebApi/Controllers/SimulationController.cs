@@ -23,6 +23,7 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "API endpoint to start a new simulation")]
         [SwaggerResponse(StatusCodes.Status204NoContent)]
         [SwaggerResponse(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("startNewSimulation")]
         public async Task<IActionResult> StartNewSimulation(StartSimulationRequest startSimulationRequest)
         {
@@ -46,13 +47,17 @@ namespace CRS.WebApi.Controllers
             {
                 foreach (var persona in personas)
                 {
-                    _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                    if (persona.Adult)
                     {
-                        PersonaId = persona.Id,
-                        SimulationId = simulation.Id,
-                        AmountOwing = 0,
-                        Group = (int)Data.TaxPayerType.INDIVIDUAL,
-                    });
+                        _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                        {
+                            PersonaId = persona.Id,
+                            SimulationId = simulation.Id,
+                            AmountOwing = 0,
+                            Group = (int)Data.TaxPayerType.INDIVIDUAL,
+                            Status = (int)Data.TaxStatus.INACTIVE
+                        });
+                    }
                 }
 
                 _unitOfWork.Save();
