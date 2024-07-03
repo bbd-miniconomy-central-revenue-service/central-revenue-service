@@ -43,10 +43,18 @@ builder.Services.AddCors(options =>
         });
 });
 
+IConfiguration config = new ConfigurationBuilder()
+                          .SetBasePath(Directory.GetCurrentDirectory())
+                          .AddJsonFile("appsettings.json", false, false)
+                          .AddJsonFile($"appsettings.Production.json", true, true)
+                          .AddEnvironmentVariables()
+                          .Build();
+                          
 builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
     options.UseSqlServer(config.GetConnectionString("DBCon"));
 });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     options =>
