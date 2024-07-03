@@ -23,13 +23,11 @@ public class BackgroundWorker(IServiceScopeFactory serviceScopeFactory, ILogger<
         logger.LogInformation(
             "{Name} is working.", ClassName);
 
-        using (IServiceScope scope = serviceScopeFactory.CreateScope())
-        {
-            IScopedProcessingService scopedProcessingService =
-                scope.ServiceProvider.GetRequiredService<IScopedProcessingService>();
+        using IServiceScope scope = serviceScopeFactory.CreateScope();
+        IScopedProcessingService scopedProcessingService =
+            scope.ServiceProvider.GetRequiredService<IScopedProcessingService>();
 
-            await scopedProcessingService.DoWorkAsync(cancellationToken);
-        }
+        await scopedProcessingService.DoWorkAsync(cancellationToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

@@ -10,4 +10,9 @@ public class TaxPaymentRepository(CrsdbContext context) : GenericRepository<TaxP
     {
         return await Find(taxPayment => taxPayment.TaxPayerId == taxPayerId);
     }
+
+    public override void DeleteAll()
+    {
+        _context.TaxPayments.ExecuteDeleteAsync();
+    }
 }

@@ -4,4 +4,7 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public class TaxTypeRepository(CrsdbContext context) : GenericRepository<TaxType, int>(context) { }
+public class TaxTypeRepository(CrsdbContext context) : GenericRepository<TaxType, int>(context) 
+{
+    
+}

@@ -98,6 +98,12 @@ namespace CRS.WebApi.Controllers
         public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
             var latestSimulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+
+            if (latestSimulation == null)
+            {
+                return NoContent();
+            }
+
             var newTaxPayer = new TaxPayer
             {
                 Name = registerBusinessRequest.BusinessName,
