@@ -18,7 +18,11 @@ import { SearchComponent } from './search/search.component';
 import { HomeComponent } from './home/home.component';
 import { AppRoutingModule } from './app-routing.module';
 import { LoginComponent } from './login/login.component';
+import { Amplify } from '@aws-amplify/core';
+import awsconfig from './../aws-exports';
+import { HttpClientModule } from '@angular/common/http';
 
+Amplify.configure(awsconfig);
 
 @NgModule({
   declarations: [
@@ -41,7 +45,8 @@ import { LoginComponent } from './login/login.component';
     MatIconModule,
     MatTableModule,
     MatPaginatorModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

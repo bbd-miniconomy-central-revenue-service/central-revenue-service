@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace server
+namespace CRS.WebApi
 {
   public class CognitoGroupRequirement(string group) : IAuthorizationRequirement
   {

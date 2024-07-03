@@ -1,5 +1,6 @@
 /* styles.css */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import '@aws-amplify/ui/dist/styles.css';
 
 body {
   margin: 0;
