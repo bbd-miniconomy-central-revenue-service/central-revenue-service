@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { HistoryService } from '../services/history.service';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -9,11 +9,22 @@ export class DashboardComponent implements OnInit {
   filter: string = '';
   subFilter: string = '';
   data = this.generateDummyData();
+  historyData: string = '';
   filteredData = this.data;
 
-  constructor() { }
+  constructor(private historyService: HistoryService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+      this.historyService.getHistory().subscribe(
+        (data) => {
+          this.historyData = data;
+          console.log("Data contains "+this.historyData);
+        },
+        (error) => {
+          console.error('Error fetching history data:', error);
+        }
+      );
+   }
 
   selectFilter(filter: string): void {
     this.filter = filter;
@@ -65,5 +76,5 @@ export class DashboardComponent implements OnInit {
       { id: '10', type: 'individual', hasPaid: false, amountPaid: 0, taxType: '' }
     ];
   }
-  
+
 }
