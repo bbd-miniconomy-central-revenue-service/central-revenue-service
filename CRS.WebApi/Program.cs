@@ -7,19 +7,41 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+// using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthorization();
+// builder.Services.AddAuthorization();
 builder.Services.AddSingleton<WeatherService>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer();
-builder.Services.ConfigureOptions<JwtBearerConfigureOptions>();
+// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer();
+// builder.Services.ConfigureOptions<JwtBearerConfigureOptions>();
+
+string? allAllowedOrigins = builder.Configuration["AppSettings:AllowedOrigins"];
+
+string[] allowedOrigins = [];
+
+if (allAllowedOrigins != null)
+{
+    allowedOrigins = allAllowedOrigins.Split(",");
+}
 
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
+
+string originsKey = "origins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: originsKey,
+        policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                .WithMethods("GET")
+                .AllowAnyHeader();
+        });
+});
 
 builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
@@ -45,13 +67,6 @@ builder.Services.AddScoped<TaxCalculatorFactory>();
 
 builder.Services.AddScoped<TaxCalculatorService>();
 
-IConfiguration config = new ConfigurationBuilder()
-                          .SetBasePath(Directory.GetCurrentDirectory())
-                          .AddJsonFile("appsettings.json", false, false)
-                          .AddJsonFile($"appsettings.Production.json", true, true)
-                          .AddEnvironmentVariables()
-                          .Build();
-
 builder.Services.AddHttpClient<HandOfZeusService>();
 builder.Services.AddHttpClient<PersonaService>();
 
@@ -67,10 +82,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapGet("/weatherforecast", (WeatherService weatherService) => weatherService.GetForecast())
-    .WithName("GetWeatherForecast").RequireAuthorization()
-    .RequireAuthorization();
+    .WithName("GetWeatherForecast");
+    // .RequireAuthorization();
 
-app.UseAuthentication();
+// app.UseAuthentication();
 
 app.UseOriginWhitelist([
     "retail_bank",
@@ -88,8 +103,11 @@ app.UseOriginWhitelist([
     "home_loans",
     "electronics_retailer"
     ]);
-app.UseAuthorization();
-app.UseAuthentication();
+// app.UseAuthorization();
+// app.UseAuthentication();
+
+    app.UseCors(originsKey);
+
 app.MapControllers();
 
 app.Run();

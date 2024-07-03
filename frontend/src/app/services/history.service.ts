@@ -13,7 +13,7 @@ export class HistoryService {
 
   getHistory(): Observable<string> {
     const headers = new HttpHeaders()
-      .set('Accept', 'text/plain')
+      .set('Accept', 'application/json')
       .set('X-Origin', 'central_revenue');
 
     return this.http.get(this.apiUrl, { headers, responseType: 'text' });
