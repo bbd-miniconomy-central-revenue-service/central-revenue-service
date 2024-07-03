@@ -8,6 +8,7 @@ on:
 
 env:
   AWS_REGION: "us-east-1"
+  AWS_BUCKET: "mers.projects.bbdgrad.com"
 
 permissions:
   id-token: write
@@ -41,3 +42,23 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+
+  DeployFrontend:
+    runs-on: ubuntu-latest
+    needs: ConfigureAwsAndTerraform
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - run: npm install
+      - run: npm audit fix
+      - run: npm run build
+      
+      - name: Deploy
+        if: success()
+        run: aws s3 sync "${{ github.workspace }}/frontend/dist/my_first_angular" ${{ env.AWS_BUCKET }}
