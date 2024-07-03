@@ -200,6 +200,11 @@ resource "aws_elastic_beanstalk_environment" "crs-elastic-beanstalk-env" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+  setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
     value     = "${aws_subnet.subnet1.id},${aws_subnet.subnet2.id}"
