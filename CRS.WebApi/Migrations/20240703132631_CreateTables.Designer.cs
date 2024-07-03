@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    [Migration("20240702233503_SeedData")]
-    partial class SeedData
+    [Migration("20240703132631_CreateTables")]
+    partial class CreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
