@@ -6,11 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CRS.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Simulation",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    startTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Simulation", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "TaxPayerType",
                 columns: table => new
@@ -71,12 +84,13 @@ namespace CRS.WebApi.Migrations
                 name: "TaxPayer",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    personaId = table.Column<int>(type: "int", nullable: true),
+                    personaId = table.Column<long>(type: "bigint", nullable: true),
                     taxPayerID = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newid())"),
                     name = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
                     group = table.Column<int>(type: "int", nullable: false),
+                    simulationId = table.Column<int>(type: "int", nullable: false),
                     status = table.Column<int>(type: "int", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())"),
                     updated = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())"),
@@ -85,6 +99,12 @@ namespace CRS.WebApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TaxPayerId", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_TaxPayer_Simulation_simulationId",
+                        column: x => x.simulationId,
+                        principalTable: "Simulation",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TaxPayer_TaxPyerType",
                         column: x => x.group,
@@ -101,9 +121,9 @@ namespace CRS.WebApi.Migrations
                 name: "TaxPayment",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
+                    id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    taxPayerID = table.Column<int>(type: "int", nullable: false),
+                    taxPayerID = table.Column<long>(type: "bigint", nullable: false),
                     amount = table.Column<decimal>(type: "money", nullable: false),
                     taxType = table.Column<int>(type: "int", nullable: false),
                     created = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(getdate())")
@@ -127,6 +147,11 @@ namespace CRS.WebApi.Migrations
                 name: "IX_TaxPayer_group",
                 table: "TaxPayer",
                 column: "group");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaxPayer_simulationId",
+                table: "TaxPayer",
+                column: "simulationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaxPayer_status",
@@ -165,6 +190,9 @@ namespace CRS.WebApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "TaxType");
+
+            migrationBuilder.DropTable(
+                name: "Simulation");
 
             migrationBuilder.DropTable(
                 name: "TaxPayerType");
