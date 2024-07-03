@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public class UserRepository(CrsdbContext context, ILogger logger) : GenericRepository<User, int>(context, logger)
+public class UserRepository(CrsdbContext context) : GenericRepository<User, int>(context)
 {
     public async Task<User?> GetByEmail(string email)
     {

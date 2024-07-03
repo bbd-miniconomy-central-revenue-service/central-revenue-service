@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public class SimulationRepository(CrsdbContext context, ILogger logger) : GenericRepository<Simulation, int>(context, logger) 
+public class SimulationRepository(CrsdbContext context) : GenericRepository<Simulation, int>(context) 
 {
     public async Task<Simulation> GetLatestSimulation()
     {

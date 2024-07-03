@@ -24,9 +24,11 @@ builder.Services.AddSwaggerGen(
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
-// builder.Services.AddScoped<UnitOfWork>();
+builder.Services.AddScoped<UnitOfWork>();
 
-// builder.Services.AddHostedService<BackgroundWorker>();
+builder.Services.AddHostedService<BackgroundWorker>();
+
+builder.Services.AddScoped<IScopedProcessingService, DefaultScopedProcessingService>();
 
 builder.Services.AddScoped<TaxCalculatorFactory>();
 

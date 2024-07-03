@@ -4,10 +4,9 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable  
+public class UnitOfWork(CrsdbContext context) : IDisposable  
 {
     private readonly CrsdbContext _context = context;
-    public readonly ILogger _logger = logger;
     private TaxTypeRepository? _taxTypeRepository;
     private TaxPaymentRepository? _taxPaymentRepository;
     private TaxPayerRepository? _taxPayerRepository;
@@ -19,7 +18,7 @@ public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable
         get
         {
 
-            this._taxTypeRepository ??= new TaxTypeRepository(this._context, this._logger);
+            this._taxTypeRepository ??= new TaxTypeRepository(this._context);
             return _taxTypeRepository;
         }
     }
@@ -29,7 +28,7 @@ public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable
         get
         {
 
-            this._taxPaymentRepository ??= new TaxPaymentRepository(this._context, this._logger);
+            this._taxPaymentRepository ??= new TaxPaymentRepository(this._context);
             return _taxPaymentRepository;
         }
     }
@@ -39,7 +38,7 @@ public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable
         get
         {
 
-            this._taxPayerRepository ??= new TaxPayerRepository(this._context, this._logger);
+            this._taxPayerRepository ??= new TaxPayerRepository(this._context);
             return _taxPayerRepository;
         }
     }
@@ -49,7 +48,7 @@ public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable
         get
         {
 
-            this._simulationRepository ??= new SimulationRepository(this._context, this._logger);
+            this._simulationRepository ??= new SimulationRepository(this._context);
             return _simulationRepository;
         }
     }
@@ -59,7 +58,7 @@ public class UnitOfWork(CrsdbContext context, ILogger logger) : IDisposable
         get
         {
 
-            this._userRepository ??= new UserRepository(this._context, this._logger);
+            this._userRepository ??= new UserRepository(this._context);
             return _userRepository;
         }
     }
