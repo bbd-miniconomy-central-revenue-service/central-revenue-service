@@ -11,7 +11,7 @@ public class PaymentService
         _context = context;
     }
 
-    public int CreatePayment(TaxInvoiceRequest taxInvoiceRequest)
+    public long CreatePayment(TaxInvoiceRequest taxInvoiceRequest)
     {
         var taxPayment = new TaxPayment
         {

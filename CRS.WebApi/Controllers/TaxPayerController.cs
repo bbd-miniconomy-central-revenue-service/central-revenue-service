@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
+using CRS.WebApi.Repositories;
 
 namespace CRS.WebApi.Controllers
 {
@@ -15,11 +16,11 @@ namespace CRS.WebApi.Controllers
     [ApiController]
     public class TaxPayerController : ControllerBase
     {
-        private readonly CrsdbContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
-        public TaxPayerController(CrsdbContext context)
+        public TaxPayerController(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/taxPayer/persona/getTaxId
@@ -27,7 +28,7 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [HttpGet("persona/getTaxId/{personaId}")]
-        public ActionResult<TaxIdResponse> GetPersonaTaxId(int personaId)
+        public ActionResult<TaxIdResponse> GetPersonaTaxId(long personaId)
         {
             return Ok(
                 new TaxIdResponse
