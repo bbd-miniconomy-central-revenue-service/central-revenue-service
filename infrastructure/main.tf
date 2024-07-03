@@ -247,10 +247,6 @@ resource "aws_elastic_beanstalk_environment" "crs-elastic-beanstalk-env" {
   }
 
   depends_on = [aws_security_group.crs-instance-sg, aws_security_group.database_sg]
-
-  lifecycle {
-    ignore_changes = all
-  }
 }
 
 resource "aws_s3_bucket" "crs-documents-20240403" {
