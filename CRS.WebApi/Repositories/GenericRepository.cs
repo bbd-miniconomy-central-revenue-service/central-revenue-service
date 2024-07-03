@@ -35,4 +35,9 @@ public abstract class GenericRepository<T, K>(
         dbSet.Attach(entity);
         _context.Entry(entity).State = EntityState.Modified;
     }
+
+    public virtual void DeleteAll()
+    {
+        throw new NotImplementedException();
+    }
 }

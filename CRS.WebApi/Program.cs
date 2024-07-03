@@ -45,8 +45,15 @@ IConfiguration config = new ConfigurationBuilder()
                           .Build();
 
 builder.Services.AddHttpClient<HandOfZeusService>();
+builder.Services.AddHttpClient<PersonaService>();
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

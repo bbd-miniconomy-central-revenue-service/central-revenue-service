@@ -14,6 +14,6 @@ public class TaxCalculatorService
     public decimal CalculateTax(decimal amount, string taxType)
     {
         ICalculator calculator = _taxCalculatorFactory.GetTaxCalculator(taxType);
-        return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(Data.TaxType), taxType.ToUpper()));
+        return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(WebApi.Data.TaxType), taxType.ToUpper()));
     }
 }

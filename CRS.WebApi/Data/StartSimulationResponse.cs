@@ -4,6 +4,6 @@ namespace CRS.WebApi.Data;
 
 public class StartSimulationResponse
 {
-    [JsonPropertyName("startTime")]
+    [JsonPropertyName("start_date")]
     public string StartTime { get; set; } = null!;
 }
