@@ -20,13 +20,13 @@ builder.Services.AddSwaggerGen(
     {
         options.EnableAnnotations();
         options.SwaggerDoc("v1", new OpenApiInfo { Title = "CentralRevenueServiceAPI", Version = "v1" });
-        options.DocumentFilter<CustomModelDocumentFilter<Enum>>();
+        options.DocumentFilter<CustomModelDocumentFilter<VerificationRequest>>();
     });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
-builder.Services.AddScoped<UnitOfWork>();
+// builder.Services.AddScoped<UnitOfWork>();
 
-builder.Services.AddHostedService<BackgroundWorker>();
+// builder.Services.AddHostedService<BackgroundWorker>();
 
 builder.Services.AddScoped<TaxCalculatorFactory>();
 
