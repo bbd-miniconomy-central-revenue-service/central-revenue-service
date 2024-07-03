@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public class TaxPayerRepository(CrsdbContext context, ILogger logger) : GenericRepository<TaxPayer, long>(context, logger)
+public class TaxPayerRepository(CrsdbContext context) : GenericRepository<TaxPayer, long>(context)
 {
     public async Task<TaxPayer?> GetByUUID(Guid uuid)
     {

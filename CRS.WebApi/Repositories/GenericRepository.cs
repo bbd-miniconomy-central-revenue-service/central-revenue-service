@@ -4,21 +4,13 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public abstract class GenericRepository<T, K> : IRepository<T, K> where T : class
+public abstract class GenericRepository<T, K>(
+    CrsdbContext context) : IRepository<T, K> where T : class
 {   
-    protected CrsdbContext _context;
-    internal DbSet<T> dbSet;
-    public readonly ILogger _logger;
+    protected CrsdbContext _context = context;
+    internal DbSet<T> dbSet = context.Set<T>();
 
-    public GenericRepository(
-        CrsdbContext context, ILogger logger)
-    {
-        _context = context;
-        this.dbSet = context.Set<T>();
-        _logger = logger;
-    }
-
-   public virtual async Task<IEnumerable<T>> All() => await dbSet.ToListAsync();
+    public virtual async Task<IEnumerable<T>> All() => await dbSet.ToListAsync();
 
    public virtual async void Create(T entity)
     {
