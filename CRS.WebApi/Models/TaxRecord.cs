@@ -9,7 +9,7 @@ public class TaxRecord
     public int TaxPayerType { get; set; }
     public int HasPaid { get; set; }
 
-    [Column("AmountOwning", TypeName = "money")]
+    [Column("AmountOwing", TypeName = "money")]
     public decimal AmountOwing { get; set; }
     public string? TaxType { get; set; }
 }

@@ -45,6 +45,7 @@ IConfiguration config = new ConfigurationBuilder()
 
 builder.Services.AddHttpClient<HandOfZeusService>();
 builder.Services.AddHttpClient<PersonaService>();
+builder.Services.AddHttpClient<CommercialBankService>();
 
 var app = builder.Build();
 

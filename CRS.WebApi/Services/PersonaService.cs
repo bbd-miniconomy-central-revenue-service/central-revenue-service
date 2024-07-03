@@ -15,7 +15,7 @@ public class PersonaService
     }
 
     public async Task<PersonaListResponse?> GetPersonas() =>
-        await _httpClient.GetFromJsonAsync<PersonaListResponse>("api/Persona/getAlivePersonas");
+        await _httpClient.GetFromJsonAsync<PersonaListResponse>("api/Persona/getAllPersonas");
 
     public async Task<List<Persona>> GetPersonaList()
     {

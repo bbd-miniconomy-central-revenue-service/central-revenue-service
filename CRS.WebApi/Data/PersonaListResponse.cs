@@ -14,14 +14,14 @@ public class Persona
     public bool Adult { get; set; }
 }
 
-public class Data
+public class PersonaListData
 {
     [JsonPropertyName("personas")]
-    public List<Persona> Personas { get; set; } = [];
+    public List<Persona> Personas { get; set; } = null!;
 }
 
 public class PersonaListResponse
 {
     [JsonPropertyName("data")]
-    public Data Data { get; set; } = null!;
+    public PersonaListData Data { get; set; } = null!;
 }
