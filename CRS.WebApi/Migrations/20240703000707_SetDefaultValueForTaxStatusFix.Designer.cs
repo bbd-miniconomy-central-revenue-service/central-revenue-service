@@ -4,6 +4,7 @@ using CRS.WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    partial class CrsdbContextModelSnapshot : ModelSnapshot
+    [Migration("20240703000707_SetDefaultValueForTaxStatusFix")]
+    partial class SetDefaultValueForTaxStatusFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,6 +81,7 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("simulationId");
 
                     b.Property<int>("Status")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int")
                         .HasColumnName("status");
 
