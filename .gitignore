@@ -490,5 +490,8 @@ site
 central-revenue-service.zip
 *.hcl
 .terraform
+*.crt
+*.key
+*.pfx
 .config
 nuget.config

@@ -39,7 +39,7 @@ namespace CRS.WebApi.Controllers
             {
                 var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
-                var paymentId = _paymentService.CreatePayment(taxInvoiceRequest);
+                long paymentId = _paymentService.CreatePayment(taxInvoiceRequest);
 
                 var taxInvoice = new TaxInvoice
                 {
