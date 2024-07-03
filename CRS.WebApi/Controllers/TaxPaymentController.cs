@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
+using CRS.WebApi.Services;
+using CRS.WebApi.Repositories;
 
 namespace CRS.WebApi.Controllers
 {
@@ -15,11 +17,13 @@ namespace CRS.WebApi.Controllers
     [ApiController]
     public class TaxPaymentController : ControllerBase
     {
-        private readonly CrsdbContext _context;
+        private readonly TaxCalculatorService _taxCalculator;
+        private readonly UnitOfWork _unitOfWork;
 
-        public TaxPaymentController(CrsdbContext context)
+        public TaxPaymentController(TaxCalculatorService taxCalculator, UnitOfWork unitOfWork)
         {
-            _context = context;
+            _taxCalculator = taxCalculator;
+            _unitOfWork = unitOfWork;
         }
 
         // POST: api/taxPayment/createTaxInvoice
@@ -28,20 +32,53 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status409Conflict)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("createTaxInvoice")]
-        public IActionResult CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
+        public async Task<IActionResult> CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
-            return Ok(
-                new TaxInvoice
+            try
+            {
+                var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
+
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
+                
+                if (taxpayer != null)
                 {
-                    PaymentId = 2,
-                    AmountDue = 1200,
-                    DueTime = new DueTime {
-                        Days = 10,
-                        Hours = 2,
-                        Minutes = 2,
-                        Seconds = 2
-                    }
-                });
+                    var taxPayment = new TaxPayment
+                    {
+                        TaxPayerId = taxpayer.Id,  
+                        Amount = taxInvoiceRequest.Amount,
+                        TaxType = (int)taxInvoiceRequest.TaxType,
+                        Created = DateTime.UtcNow 
+                    };
+
+                    _unitOfWork.TaxPaymentRepository.Create(taxPayment);
+                    _unitOfWork.Save();
+
+                    var taxInvoice = new TaxInvoice
+                    {
+                        PaymentId = taxPayment.Id,
+                        AmountDue = tax,
+                        DueTime = new DueTime
+                        {
+                            Days = 10,
+                            Hours = 2,
+                            Minutes = 2,
+                            Seconds = 2
+                        }
+                    };
+
+                    return Ok(taxInvoice);
+
+                }
+                else
+                {  
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice");
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
         }
 
         // POST: api/taxPayment/submitNoticeOfPayment

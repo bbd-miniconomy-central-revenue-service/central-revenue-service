@@ -3,12 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace CRS.WebApi.Data
 {
-    public enum TaxType 
-    {
-        INCOME,
-        VAT,
-        PROPERTY
-    }
     public class TaxInvoiceRequest
     {
         [Required]

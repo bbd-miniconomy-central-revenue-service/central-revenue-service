@@ -22,5 +22,5 @@ public partial class TaxPayerType
     public DateTime? Created { get; set; }
 
     [InverseProperty("GroupNavigation")]
-    public virtual ICollection<TaxPayer> TaxPayers { get; set; } = new List<TaxPayer>();
+    public virtual ICollection<TaxPayer> TaxPayers { get; set; } = [];
 }

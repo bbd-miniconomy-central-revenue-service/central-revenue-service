@@ -1,0 +1,39 @@
+name: Frontend
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: "us-east-1"
+  AWS_BUCKET: "s3://mers.projects.bbdgrad.com"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  DeployFrontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - run: npm install
+      - run: npm run build
+
+      - name: Deploy
+        if: success()
+        run: aws s3 sync "${{ github.workspace }}/frontend/dist/my_first_angular" ${{ env.AWS_BUCKET }}

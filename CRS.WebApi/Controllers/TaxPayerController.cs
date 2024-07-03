@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
+using CRS.WebApi.Repositories;
 
 namespace CRS.WebApi.Controllers
 {
@@ -15,11 +16,11 @@ namespace CRS.WebApi.Controllers
     [ApiController]
     public class TaxPayerController : ControllerBase
     {
-        private readonly CrsdbContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
-        public TaxPayerController(CrsdbContext context)
+        public TaxPayerController(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/taxPayer/persona/getTaxId
@@ -27,14 +28,33 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [HttpGet("persona/getTaxId/{personaId}")]
-        public ActionResult<TaxIdResponse> GetPersonaTaxId(int personaId)
+        public async Task<ActionResult<TaxIdResponse>> GetPersonaTaxId(long personaId)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByPersonaId(personaId);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+            
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
+            
         }
 
         // GET: api/taxPayer/business/getTaxNUmber
@@ -42,14 +62,32 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [HttpGet("business/getTaxId/{businessName}")]
-        public ActionResult<TaxIdResponse> GetBusinessTaxId(string businessName)
+        public async Task<ActionResult<TaxIdResponse>> GetBusinessTaxId(string businessName)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByName(businessName);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId                    
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+            
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
         }
 
         // POST: api/taxPayer/business/register
@@ -57,8 +95,27 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict)]
         [HttpPost("business/register")]
-        public ActionResult<TaxIdResponse> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
+        public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
+            var latestSimulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+
+            if (latestSimulation == null)
+            {
+                return NoContent();
+            }
+
+            var newTaxPayer = new TaxPayer
+            {
+                Name = registerBusinessRequest.BusinessName,
+                Group = (int)Data.TaxPayerType.BUSINESS,
+                Status = (int)Data.TaxStatus.ACTIVE,
+                AmountOwing = 0,
+                SimulationId = latestSimulation.Id
+            };
+            
+            _unitOfWork.TaxPayerRepository.Create(newTaxPayer);
+            _unitOfWork.Save();
+
             return Ok(
                 new TaxIdResponse
                 {
