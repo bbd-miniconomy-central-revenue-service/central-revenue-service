@@ -11,8 +11,7 @@ public class HandOfZeusService
 
         _httpClient.BaseAddress = new Uri("https://api.zeus.projects.bbdgrad.com");
 
-        httpClient.DefaultRequestHeaders.Add(
-            HeaderNames.Origin, "central_revenue");
+        httpClient.DefaultRequestHeaders.Add("X-Origin", "central_revenue");
     }
 
     public async Task<TaxRateResponse?> GetTaxRates() =>
