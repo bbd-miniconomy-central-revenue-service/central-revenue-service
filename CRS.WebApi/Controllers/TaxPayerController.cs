@@ -28,14 +28,33 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [HttpGet("persona/getTaxId/{personaId}")]
-        public ActionResult<TaxIdResponse> GetPersonaTaxId(long personaId)
+        public async Task<ActionResult<TaxIdResponse>> GetPersonaTaxId(long personaId)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByPersonaId(personaId);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+            
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
+            
         }
 
         // GET: api/taxPayer/business/getTaxNUmber
@@ -43,14 +62,32 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [HttpGet("business/getTaxId/{businessName}")]
-        public ActionResult<TaxIdResponse> GetBusinessTaxId(string businessName)
+        public async Task<ActionResult<TaxIdResponse>> GetBusinessTaxId(string businessName)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByName(businessName);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId                    
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+            
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+            }
         }
 
         // POST: api/taxPayer/business/register

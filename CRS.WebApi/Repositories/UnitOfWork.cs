@@ -13,6 +13,8 @@ public class UnitOfWork(CrsdbContext context) : IDisposable
     private SimulationRepository? _simulationRepository;
     private UserRepository? _userRepository;
 
+    private TaxRecordViewRepository? _taxRecordViewRepository;
+
     public TaxTypeRepository TaxTypeRepository
     {
         get
@@ -62,6 +64,17 @@ public class UnitOfWork(CrsdbContext context) : IDisposable
             return _userRepository;
         }
     }
+
+    public TaxRecordViewRepository TaxRecordViewRepository
+    {
+        get
+        {
+
+            this._taxRecordViewRepository??= new TaxRecordViewRepository(this._context);
+            return _taxRecordViewRepository;
+        }
+    }
+
 
     public void Save()
     {

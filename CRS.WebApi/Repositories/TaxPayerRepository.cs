@@ -11,6 +11,16 @@ public class TaxPayerRepository(CrsdbContext context) : GenericRepository<TaxPay
         return (await Find(taxPayer => taxPayer.TaxPayerId == uuid)).FirstOrDefault();
     }
 
+    public async Task<TaxPayer?> GetByName(string companyName)
+    {
+        return (await Find(taxPayer => taxPayer.Name == companyName)).FirstOrDefault();
+    }
+
+    public async Task<TaxPayer?> GetByPersonaId(long id)
+    {
+        return (await Find(taxPayer => taxPayer.PersonaId == id)).FirstOrDefault();
+    }
+
     public override void DeleteAll()
     {
         _context.TaxPayers.ExecuteDeleteAsync();
