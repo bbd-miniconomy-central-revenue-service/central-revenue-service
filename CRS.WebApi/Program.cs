@@ -3,6 +3,7 @@ using CRS.WebApi.Models;
 using CRS.WebApi.Repositories;
 using CRS.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 
@@ -36,11 +37,35 @@ builder.Services.AddScoped<TaxCalculatorService>();
 
 builder.Services.AddScoped<PaymentService>();
 
+IConfiguration config = new ConfigurationBuilder()
+                          .SetBasePath(Directory.GetCurrentDirectory())
+                          .AddJsonFile("appsettings.json", false, false)
+                          .AddJsonFile($"appsettings.Production.json", true, true)
+                          .AddEnvironmentVariables()
+                          .Build();
+
+builder.Services.AddHttpClient<HandOfZeusService>();
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseOriginWhitelist([
+    "retail_bank",
+    "commercial_bank",
+    "health_insurance",
+    "life_insurance",
+    "short_term_insurance",
+    "health_care",
+    "central_revenue",
+    "labour",
+    "stock_exchange",
+    "real_estate_sales",
+    "real_estate_agent",
+    "short_term_lender",
+    "home_loans",
+    "electronics_retailer"
+    ]);
 app.UseAuthorization();
 app.UseAuthentication();
 app.MapControllers();
