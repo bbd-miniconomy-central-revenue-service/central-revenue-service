@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: "us-east-1"
-  AWS_BUCKET: "mers.projects.bbdgrad.com"
+  AWS_BUCKET: "s3://mers.projects.bbdgrad.com"
 
 permissions:
   id-token: write
