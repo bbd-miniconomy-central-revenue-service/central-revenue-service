@@ -31,9 +31,9 @@ public sealed class DefaultScopedProcessingService(
             var income = await _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.INCOME);
             var property = await _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.PROPERTY);
 
-            if (taxRateResponse.Vat != null) vat!.Rate = (decimal)taxRateResponse.Vat;
-            if (taxRateResponse.Income != null) income!.Rate = (decimal)taxRateResponse.Income;
-            if (taxRateResponse.Property != null) property!.Rate = (decimal)taxRateResponse.Property;
+            if (taxRateResponse.Vat != null) vat!.Rate = (int)taxRateResponse.Vat;
+            if (taxRateResponse.Income != null) income!.Rate = (int)taxRateResponse.Income;
+            if (taxRateResponse.Property != null) property!.Rate = (int)taxRateResponse.Property;
 
             _unitOfWork.TaxTypeRepository.Update(vat!);
             _unitOfWork.TaxTypeRepository.Update(income!);
@@ -61,6 +61,7 @@ public sealed class DefaultScopedProcessingService(
                 };
 
                 _unitOfWork.SimulationRepository.Create(simulation);
+                _unitOfWork.Save();
 
                 _unitOfWork.TaxPaymentRepository.DeleteAll();
                 _unitOfWork.TaxPayerRepository.DeleteAll();
