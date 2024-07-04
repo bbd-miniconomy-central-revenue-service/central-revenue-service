@@ -22,7 +22,7 @@
           <mat-card-subtitle>{{ result.hasPaid ? 'Paid' : 'In Arrears' }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <p><strong>Amount Owed:</strong> {{ result.amountOwing | currency }}</p>
+          <p><strong>Amount Owed:</strong> {{ result.amountOwing | currency: 'BBD$' }}</p>
           <p *ngIf="result.type === 'BUSINESS'"><strong>Tax Type:</strong> {{ result.taxType | titlecase }}</p>
         </mat-card-content>
       </mat-card>
