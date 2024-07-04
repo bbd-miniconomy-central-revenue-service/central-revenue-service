@@ -15,16 +15,14 @@ namespace CRS.WebApi.Controllers
 {
     [Route("api/taxpayment")]
     [ApiController]
-    public class TaxPaymentController : ControllerBase
+    public class TaxPaymentController(
+        TaxCalculatorService taxCalculator, 
+        UnitOfWork unitOfWork, 
+        PaymentVerificationService paymentVerificationService) : ControllerBase
     {
-        private readonly TaxCalculatorService _taxCalculator;
-        private readonly UnitOfWork _unitOfWork;
-
-        public TaxPaymentController(TaxCalculatorService taxCalculator, UnitOfWork unitOfWork)
-        {
-            _taxCalculator = taxCalculator;
-            _unitOfWork = unitOfWork;
-        }
+        private readonly TaxCalculatorService _taxCalculator = taxCalculator;
+        private readonly UnitOfWork _unitOfWork = unitOfWork;
+        private readonly PaymentVerificationService _paymentVerificationService = paymentVerificationService;
 
         // POST: api/taxPayment/createTaxInvoice
         [SwaggerOperation(Summary = "Creates a tax payment record and sends back an invoice")]
@@ -54,13 +52,11 @@ namespace CRS.WebApi.Controllers
                     _unitOfWork.TaxPaymentRepository.Create(taxPayment);
                     _unitOfWork.Save();
 
-                    var taxInvoice = new TaxInvoice
+                    return Ok(new TaxInvoice
                     {
                         PaymentId = taxPayment.Id,
                         AmountDue = tax,
-                    };
-
-                    return Ok(taxInvoice);
+                    });
 
                 }
                 else
@@ -77,15 +73,13 @@ namespace CRS.WebApi.Controllers
 
         // POST: api/taxPayment/submitNoticeOfPayment
         [SwaggerOperation(Summary = "Verifies that payment has been made and updates the corresponding payment record. A VerificationRequest is sent to the callback URL with the results.")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(NoticeOfPaymentResponse))]
+        [SwaggerResponse(StatusCodes.Status202Accepted, Type = typeof(NoticeOfPaymentResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("submitNoticeOfPayment")]
         public IActionResult SubmitNoticeOfPayment(NoticeOfPaymentRequest noticeOfPaymentRequest)
         {
-            return Ok(
-                new NoticeOfPaymentResponse
-                {
-                    Result = "success"
-                });
+            _ = _paymentVerificationService.UpdatePayment(noticeOfPaymentRequest);
+            return StatusCode(StatusCodes.Status202Accepted, "Processing request");
         }
     }
 }
