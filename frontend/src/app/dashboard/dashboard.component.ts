@@ -1,19 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HistoryService } from '../services/history.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   filter: string = '';
   subFilter: string = '';
-  data = this.generateDummyData();
-  filteredData = this.data;
+  historyData: any[] = [];
+  filteredData: any[] = [];
+  private historySubscription: Subscription | undefined;
 
-  constructor() { }
+  constructor(private historyService: HistoryService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.historySubscription = this.historyService.getHistory().subscribe(
+      (data) => {
+        if (typeof data === 'string') {
+          this.historyData = JSON.parse(data);
+        } else {
+          this.historyData = data;
+        }
+        this.filteredData = this.historyData;
+      },
+      (error) => {
+        console.error('Error fetching history data:', error);
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    if (this.historySubscription) {
+      this.historySubscription.unsubscribe();
+    }
+  }
 
   selectFilter(filter: string): void {
     this.filter = filter;
@@ -27,43 +50,28 @@ export class DashboardComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredData = this.data;
+    this.filteredData = this.historyData;
 
     if (this.filter === 'individuals') {
-      this.filteredData = this.filteredData.filter(data => data.type === 'individual');
+      this.filteredData = this.filteredData.filter(data => data.type === 'INDIVIDUAL');
     } else if (this.filter === 'companies') {
-      this.filteredData = this.filteredData.filter(data => data.type === 'company');
+      this.filteredData = this.filteredData.filter(data => data.type === 'BUSINESS');
       if (this.subFilter) {
-        this.filteredData = this.filteredData.filter(data => data.taxType === this.subFilter);
+        console.log("subfilter value is: "+this.subFilter);
+        this.filteredData = this.filteredData.filter(data => data.taxType === this.subFilter.toUpperCase());
       }
     } else if (this.filter === 'hasPaid') {
-      this.filteredData = this.filteredData.filter(data => data.hasPaid);
+      this.filteredData = this.filteredData.filter(data => data.hasPaid === 1);
     } else if (this.filter === 'inArrears') {
-      this.filteredData = this.filteredData.filter(data => !data.hasPaid);
+      this.filteredData = this.filteredData.filter(data => data.hasPaid === 0);
     }
   }
 
   getPaidTaxPayersCount(): number {
-    return this.filteredData.filter(data => data.hasPaid).length;
+    return this.filteredData.filter(data => data.hasPaid === 1).length;
   }
 
   getAmountCollected(): number {
-    return this.filteredData.filter(data => data.hasPaid).reduce((acc, curr) => acc + curr.amountPaid, 0);
+    return this.filteredData.filter(data => data.hasPaid === 1).reduce((acc, curr) => acc + curr.amountOwing, 0);
   }
-
-  generateDummyData() {
-    return [
-      { id: '1', type: 'individual', hasPaid: true, amountPaid: 1000, taxType: '' },
-      { id: '2', type: 'company', hasPaid: false, amountPaid: 0, taxType: 'vat' },
-      { id: '3', type: 'individual', hasPaid: true, amountPaid: 1500, taxType: '' },
-      { id: '4', type: 'company', hasPaid: true, amountPaid: 2000, taxType: 'incomeTax' },
-      { id: '5', type: 'individual', hasPaid: false, amountPaid: 0, taxType: '' },
-      { id: '6', type: 'company', hasPaid: true, amountPaid: 3000, taxType: 'vat' },
-      { id: '7', type: 'company', hasPaid: false, amountPaid: 0, taxType: 'incomeTax' },
-      { id: '8', type: 'individual', hasPaid: true, amountPaid: 1200, taxType: '' },
-      { id: '9', type: 'company', hasPaid: true, amountPaid: 5000, taxType: 'vat' },
-      { id: '10', type: 'individual', hasPaid: false, amountPaid: 0, taxType: '' }
-    ];
-  }
-  
 }
