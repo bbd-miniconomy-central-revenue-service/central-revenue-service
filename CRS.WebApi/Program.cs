@@ -71,7 +71,8 @@ app.UseOriginWhitelist([
     "real_estate_agent",
     "short_term_lender",
     "home_loans",
-    "electronics_retailer"
+    "electronics_retailer",
+    "food_retailer"
     ]);
 app.UseAuthorization();
 app.UseAuthentication();

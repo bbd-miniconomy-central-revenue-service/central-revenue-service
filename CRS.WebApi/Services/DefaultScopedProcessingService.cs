@@ -14,6 +14,7 @@ public sealed class DefaultScopedProcessingService(
     private readonly UnitOfWork _unitOfWork = unitOfWork;
     private readonly HandOfZeusService _handOfZeusService = handOfZeusService;
     private readonly PersonaService _personaService = personaService;
+    private readonly int _minute = 60_0000;
 
     public async Task DoWorkAsync(CancellationToken stoppingToken)
     {
@@ -23,7 +24,7 @@ public sealed class DefaultScopedProcessingService(
         {
             await UpdateTaxRates();
 
-            await Task.Delay(60_0000 * 2, stoppingToken);
+            await Task.Delay(_minute * 2, stoppingToken);
         }
     }
 

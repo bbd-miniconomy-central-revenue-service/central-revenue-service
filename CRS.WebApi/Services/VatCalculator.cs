@@ -1,23 +1,22 @@
 ﻿namespace CRS.WebApi.Services
 {
     using CRS.WebApi.Models;
-    public class VatCalculator : ICalculator
+    using CRS.WebApi.Repositories;
+
+    public class VatCalculator : ICalculator<decimal, int>
     {
-        private readonly CrsdbContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
-        public VatCalculator(CrsdbContext context)
+        public VatCalculator(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public decimal CalculateTax(decimal amount, decimal rate)
-        {
-            return amount * rate;
-        }
+        public decimal CalculateTax(decimal amount, int rate) => amount * rate * (decimal)0.01;
 
-        public decimal CalculateTaxWithRateFromDb(decimal amount, int taxTypeId)
+        public async Task<decimal> CalculateTaxWithRateFromDb(decimal amount, int taxTypeId)
         {
-            var taxType = _context.TaxTypes.Find(taxTypeId);
+            var taxType = await _unitOfWork.TaxTypeRepository.GetById(taxTypeId);
             return taxType == null ? throw new Exception("TaxType not found.") : CalculateTax(amount, taxType.Rate);
         }
     }

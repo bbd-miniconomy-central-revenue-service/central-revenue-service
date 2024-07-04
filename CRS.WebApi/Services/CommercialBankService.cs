@@ -15,10 +15,13 @@ public class CommercialBankService
     }
 
     public async Task<TranscactionsResponse?> GetTransactions() =>
-        await _httpClient.GetFromJsonAsync<TranscactionsResponse>("transcation");
+        await _httpClient.GetFromJsonAsync<TranscactionsResponse>("transcations");
 
-    /*public async Task<StartSimulationResponse?> GetTransactionByRef(string reference)
+    public async Task<Transaction?> GetTransactionByRef(string reference)
     {
+        var transcations = (await GetTransactions())?.Data.Transactions;
+        var transactionByRef = transcations?.FirstOrDefault(transaction => transaction.Reference == reference);
 
-    }*/
+        return transactionByRef;
+    }
 }

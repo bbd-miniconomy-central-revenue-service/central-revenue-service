@@ -11,6 +11,11 @@ public class TaxPaymentRepository(CrsdbContext context) : GenericRepository<TaxP
         return await Find(taxPayment => taxPayment.TaxPayerId == taxPayerId);
     }
 
+    public async Task<List<TaxPayment>> GetUnsettledPayments()
+    {
+        return (await Find(taxPayment => taxPayment.Settled == false)).ToList();
+    }
+
     public override void DeleteAll()
     {
         _context.TaxPayments.ExecuteDeleteAsync();

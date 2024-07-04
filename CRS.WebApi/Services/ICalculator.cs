@@ -1,9 +1,9 @@
 ﻿namespace CRS.WebApi.Services
 {
-    public interface ICalculator
+    public interface ICalculator<T, K>
     {
-        decimal CalculateTax(decimal amount, decimal rate);
-        decimal CalculateTaxWithRateFromDb(decimal amount, int taxTypeId);
+        T CalculateTax(T amount, K rate);
+        Task<T> CalculateTaxWithRateFromDb(T amount, int taxTypeId);
     }
 }
 

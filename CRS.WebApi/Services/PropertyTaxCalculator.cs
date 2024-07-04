@@ -1,24 +1,22 @@
 ﻿namespace CRS.WebApi.Services
 {
     using CRS.WebApi.Models;
+    using CRS.WebApi.Repositories;
 
-    public class PropertyTaxCalculator : ICalculator
+    public class PropertyTaxCalculator : ICalculator<decimal, int>
     {
-        private readonly CrsdbContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
-        public PropertyTaxCalculator(CrsdbContext context)
+        public PropertyTaxCalculator(UnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
-        public decimal CalculateTax(decimal amount, decimal rate)
+        public decimal CalculateTax(decimal amount, int rate) => amount* rate * (decimal)0.01;
+
+        public async Task<decimal> CalculateTaxWithRateFromDb(decimal amount, int taxTypeId)
         {
-            return amount * rate;
-        }
-        
-        public decimal CalculateTaxWithRateFromDb(decimal amount, int taxTypeId)
-        {
-            var taxType = _context.TaxTypes.FirstOrDefault(t => t.Id == taxTypeId);
+            var taxType = await _unitOfWork.TaxTypeRepository.GetById(taxTypeId);
             return taxType == null ? throw new Exception("TaxType not found.") : CalculateTax(amount, taxType.Rate);
         }
     }
