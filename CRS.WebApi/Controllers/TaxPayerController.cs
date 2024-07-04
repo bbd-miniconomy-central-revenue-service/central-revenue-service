@@ -27,6 +27,8 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Gets the taxID for a persona")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpGet("persona/getTaxId/{personaId}")]
         public async Task<ActionResult<TaxIdResponse>> GetPersonaTaxId(long personaId)
         {
@@ -61,6 +63,8 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Gets the taxID for a business.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpGet("business/getTaxId/{businessName}")]
         public async Task<ActionResult<TaxIdResponse>> GetBusinessTaxId(string businessName)
         {
@@ -94,6 +98,8 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Registers a business and assigns it a taxID.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status416RangeNotSatisfiable)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpPost("business/register")]
         public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
@@ -140,15 +146,35 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Gets the tax statment for a tax payer")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxStatementResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpGet("getTaxStatement/{taxId}")]
-        public ActionResult<TaxStatementResponse> GetTaxStatement(Guid taxId)
+        public async Task<ActionResult<TaxStatementResponse>> GetTaxStatement(Guid taxId)
         {
-            return Ok(
-                new TaxStatementResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxId);
+
+                if (taxpayer != null)
                 {
-                    AmountOwing = 0
+                    return Ok(
+                        new TaxStatementResponse
+                        {
+                            AmountOwing = taxpayer.AmountOwing
+                        }
+                    );
+
                 }
-            );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
+            }
         }
     }
 }

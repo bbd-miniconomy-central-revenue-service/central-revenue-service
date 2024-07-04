@@ -1,6 +1,8 @@
 using CRS.WebApi.Data;
 using Microsoft.Net.Http.Headers;
 
+namespace CRS.WebApi.Services;
+
 public class PersonaService
 {
     private readonly HttpClient _httpClient;

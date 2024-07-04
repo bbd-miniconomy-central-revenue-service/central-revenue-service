@@ -9,12 +9,15 @@ public sealed class DefaultScopedProcessingService(
     ILogger<DefaultScopedProcessingService> logger, 
     UnitOfWork unitOfWork,
     HandOfZeusService handOfZeusService,
-    PersonaService personaService) : IScopedProcessingService
+    PersonaService personaService,
+    CommercialBankService commercialBakingService) : IScopedProcessingService
 {
     private readonly UnitOfWork _unitOfWork = unitOfWork;
     private readonly HandOfZeusService _handOfZeusService = handOfZeusService;
     private readonly PersonaService _personaService = personaService;
+    private readonly CommercialBankService _commercialBankService = commercialBakingService;
     private readonly int _minute = 60_0000;
+    private int _minuteCounter = 0;
 
     public async Task DoWorkAsync(CancellationToken stoppingToken)
     {
@@ -24,7 +27,22 @@ public sealed class DefaultScopedProcessingService(
         {
             await UpdateTaxRates();
 
+            _minuteCounter += 2;
+
             await Task.Delay(_minute * 2, stoppingToken);
+
+            if (_minuteCounter == 60)
+            {
+                logger.LogInformation(
+                    "{ServiceName} settling payments",
+                    nameof(DefaultScopedProcessingService));
+
+                await SettlePayments();
+
+                await _commercialBankService.MakePayment("labour-broker");
+
+                _minuteCounter = 0;
+            }
         }
     }
 
@@ -105,5 +123,27 @@ public sealed class DefaultScopedProcessingService(
         }
 
         return default;
+    }
+
+    public async Task SettlePayments()
+    {
+        var taxpayersInDebt = await _unitOfWork.TaxPayerRepository.GetOwingTaxPayers();
+        var surplusTaxpayers = await _unitOfWork.TaxPayerRepository.GetSurplusTaxPayers();
+
+        foreach (var taxpayer in taxpayersInDebt)
+        {
+            if (taxpayer.Group == (int)Data.TaxPayerType.BUSINESS)
+            {
+                await _commercialBankService.CreateDebitOrder(taxpayer.Name!.Replace("_", "-"), taxpayer.AmountOwing);
+            }
+        }
+
+        foreach (var taxpayer in surplusTaxpayers)
+        {
+            if (taxpayer.Group == (int)Data.TaxPayerType.BUSINESS)
+            {
+                await _commercialBankService.MakePayment(taxpayer.Name!.Replace("_", "-"), -taxpayer.AmountOwing);
+            }
+        }
     }
 }

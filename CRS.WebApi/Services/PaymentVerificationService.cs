@@ -17,32 +17,41 @@ public sealed class PaymentVerificationService(
 
     public async Task UpdatePayment(NoticeOfPaymentRequest noticeOfPaymentRequest)
     {
-        var (payment, amountShort) =  await VerifyPayment(noticeOfPaymentRequest.TaxId.ToString(), noticeOfPaymentRequest.PaymentId);
+        
+        var (payment, amountShort, taxpayer) = await VerifyPayment(noticeOfPaymentRequest.TaxId.ToString(), 
+            noticeOfPaymentRequest.PaymentId);
 
         if (payment != null) 
         {
             _unitOfWork.TaxPaymentRepository.Update(payment);
+            
+            taxpayer!.AmountOwing = amountShort;
+
+            _unitOfWork.TaxPayerRepository.Update(taxpayer!);
+
             _unitOfWork.Save();
 
             if (noticeOfPaymentRequest.CallbackURL != null)
             {
-                if (amountShort > 0) 
+                if (amountShort > 0)
                 {
-                    await SendVerificationResults(noticeOfPaymentRequest.CallbackURL, 
+                    await SendVerificationResults(noticeOfPaymentRequest.CallbackURL,
                         noticeOfPaymentRequest.PaymentId, amountShort, "failed");
                 }
                 else
                 {
-                    await SendVerificationResults(noticeOfPaymentRequest.CallbackURL, 
+
+                    await SendVerificationResults(noticeOfPaymentRequest.CallbackURL,
                         noticeOfPaymentRequest.PaymentId, amountShort, "success");
                 }
             }
-        }
-
-        if (noticeOfPaymentRequest.CallbackURL != null)
+        } else
         {
-            await SendVerificationResults(noticeOfPaymentRequest.CallbackURL,
-                noticeOfPaymentRequest.PaymentId, amountShort, "failed");
+            if (noticeOfPaymentRequest.CallbackURL != null)
+            {
+                await SendVerificationResults(noticeOfPaymentRequest.CallbackURL,
+                    noticeOfPaymentRequest.PaymentId, amountShort, "failed");
+            }
         }
     }
 
@@ -65,25 +74,32 @@ public sealed class PaymentVerificationService(
         await httpClient.SendAsync(request);
     }
 
-    public async Task<Tuple<TaxPayment?, decimal>> VerifyPayment(string taxId, int paymentId)
+    public async Task<Tuple<TaxPayment?, decimal, TaxPayer?>> VerifyPayment(string taxId, int paymentId)
     {
         var transaction = await _commercialBankService.GetTransactionByRef(taxId);
 
-        if (transaction == null) return Tuple.Create<TaxPayment?, decimal>(default, 0);
+        if (transaction == null) return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(default, 0, default);
 
         var payment = await _unitOfWork.TaxPaymentRepository.GetById(paymentId);
 
-        if (payment == null) return Tuple.Create<TaxPayment?, decimal>(default, 0);
+        if (payment == null) return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(default, 0, default);
 
-        if (payment.Amount == transaction.Amount)
+        var taxpayer = await _unitOfWork.TaxPayerRepository.GetById(payment.TaxPayerId);
+
+        if (transaction.Amount >= payment.Amount)
         {
             payment.Settled = true;
-            return Tuple.Create<TaxPayment?, decimal>(payment, 0);
+
+            // In case of a surplus
+            taxpayer!.AmountOwing -= (transaction.Amount - payment.Amount);
+
+            return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(payment, 0, taxpayer);
         }
 
-        payment.Amount -= transaction.Amount;
+        // Check for credits
+        var diff = payment.Amount - (transaction.Amount + (-taxpayer!.AmountOwing));
 
-        return Tuple.Create<TaxPayment?, decimal>(payment, payment.Amount - transaction.Amount);
+        return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(payment, diff, taxpayer);
     }
 
 }
