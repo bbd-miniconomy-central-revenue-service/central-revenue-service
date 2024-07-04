@@ -7,17 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
-// using Microsoft.AspNetCore.Authentication.JwtBearer;
-// using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Services.AddAuthorization();
-builder.Services.AddSingleton<WeatherService>();
-
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer();
-// builder.Services.ConfigureOptions<JwtBearerConfigureOptions>();
 string? allAllowedOrigins = builder.Configuration["AppSettings:AllowedOrigins"];
 
 string[] allowedOrigins = [];
@@ -30,7 +22,8 @@ if (allAllowedOrigins != null)
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 
-builder.Services.AddDbContext<CrsdbContext>((provider, options) => {
+builder.Services.AddDbContext<CrsdbContext>((provider, options) =>
+{
     IConfiguration config = provider.GetRequiredService<IConfiguration>();
     options.UseSqlServer(config.GetConnectionString("DBCon"));
 });
@@ -95,12 +88,6 @@ if (!app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapGet("/weatherforecast", (WeatherService weatherService) => weatherService.GetForecast())
-    .WithName("GetWeatherForecast");
-    // .RequireAuthorization();
-
-// app.UseAuthentication();
-
 app.UseOriginWhitelist([
     "retail_bank",
     "commercial_bank",
@@ -118,8 +105,6 @@ app.UseOriginWhitelist([
     "electronics_retailer",
     "food_retailer"
     ]);
-// app.UseAuthorization();
-// app.UseAuthentication();
 
 app.MapControllers();
 
