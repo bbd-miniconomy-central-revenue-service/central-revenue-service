@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class HistoryService {
 
-  private apiUrl = 'http://localhost:5000/api/records/history';
+  private apiUrl = 'https://api.mers.projects.bbdgrad.com/api/records/history';
 
   constructor(private http: HttpClient) { }
 

@@ -12,8 +12,8 @@ const awsconfig = {
         'profile',
         'aws.cognito.signin.user.admin'
       ],
-      redirectSignIn: 'http://localhost:4200/dashboard',    // Add your own redirect sign-in url
-      redirectSignOut: 'http://localhost:4200',   // Add your own redirect sign-out url
+      redirectSignIn: 'https://mers.projects.bbdgrad.com/dashboard',    // Add your own redirect sign-in url
+      redirectSignOut: 'https://mers.projects.bbdgrad.com',   // Add your own redirect sign-out url
       responseType: 'code'
     }
   };

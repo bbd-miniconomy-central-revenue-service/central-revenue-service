@@ -22,7 +22,7 @@ export class AuthService {
       .set('client_id', '165320a8ntn332eks21c3q7r8l')
       .set('client_secret', '123nqgvun6p08j55givh5r15v2b0re5g31bh526luir5e6clieqv')
       .set('code', authCode)
-      .set('redirect_uri', 'http://localhost:4200');
+      .set('redirect_uri', 'https://mers.projects.bbdgrad.com');
 
     return this.http.post(this.tokenUrl, body.toString(), { headers });
   }
