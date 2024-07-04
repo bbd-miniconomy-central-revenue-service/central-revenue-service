@@ -40,6 +40,8 @@ class AuthGuard implements CanActivate {
           // Handle the error as needed
         }
       );
+    } else {
+      this.router.navigate(['/home']);
     }
     console.log("result is: "+result);
     window.history.replaceState({}, document.title, window.location.pathname);
