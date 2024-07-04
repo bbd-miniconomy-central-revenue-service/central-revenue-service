@@ -55,11 +55,10 @@ class AuthGuard implements CanActivate {
 }
 
 const routes: Routes = [
-  // { path: 'dashboard', component: DashboardComponent, pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, // Default route
   { path: 'home', component: HomeComponent, pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // Default route
-  { path: '**', redirectTo: '/dashboard' } // Wildcard route for a 404 page
+  { path: '**', redirectTo: '/home' } // Wildcard route for a 404 page
 ];
 
 @NgModule({
