@@ -37,6 +37,7 @@ namespace CRS.WebApi.Controllers
                 };
 
                 _unitOfWork.SimulationRepository.Create(simulation);
+                _unitOfWork.Save();
             }
 
             _unitOfWork.TaxPaymentRepository.DeleteAll();
