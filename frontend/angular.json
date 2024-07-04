@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my_first_angular": {
+    "Central_Revenue_Service": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/my_first_angular",
+            "outputPath": "dist/Central_Revenue_Service",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -61,10 +61,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "my_first_angular:build:production"
+              "browserTarget": "Central_Revenue_Service:build:production"
             },
             "development": {
-              "browserTarget": "my_first_angular:build:development"
+              "browserTarget": "Central_Revenue_Service:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -72,7 +72,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "my_first_angular:build"
+            "browserTarget": "Central_Revenue_Service:build"
           }
         },
         "test": {

@@ -21,4 +21,7 @@ public partial class User
 
     [Column("created")]
     public DateTime? Created { get; set; }
+
+    public string? Username { get; set; } = null;
+    public string? UserPicUrl { get; set; } = null;
 }

@@ -16,14 +16,21 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SearchComponent } from './search/search.component';
 import { HomeComponent } from './home/home.component';
-import { AppRoutingModule } from './app-routing.module'; // Import AppRoutingModule
+import { AppRoutingModule } from './app-routing.module';
+import { LoginComponent } from './login/login.component';
+import { Amplify } from '@aws-amplify/core';
+import awsconfig from './../aws-exports';
+import { HttpClientModule } from '@angular/common/http';
+
+Amplify.configure(awsconfig);
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     SearchComponent,
-    HomeComponent
+    HomeComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -38,7 +45,8 @@ import { AppRoutingModule } from './app-routing.module'; // Import AppRoutingMod
     MatIconModule,
     MatTableModule,
     MatPaginatorModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

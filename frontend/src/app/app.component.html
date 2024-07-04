@@ -1,7 +1,8 @@
 <mat-toolbar color="primary">
-    Revenue Service Dashboard
-  </mat-toolbar>
-  <div class="main-content">
-    <router-outlet></router-outlet>
-  </div>
-  
+  <span>Revenue Service Dashboard</span>
+  <span class="spacer"></span>
+  <button mat-button *ngIf="accessToken" (click)="logout()">Logout</button>
+</mat-toolbar>
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>
