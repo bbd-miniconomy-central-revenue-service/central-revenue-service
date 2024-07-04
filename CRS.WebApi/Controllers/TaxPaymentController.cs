@@ -29,8 +29,9 @@ namespace CRS.WebApi.Controllers
         // POST: api/taxPayment/createTaxInvoice
         [SwaggerOperation(Summary = "Creates a tax payment record and sends back an invoice")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxInvoice))]
-        [SwaggerResponse(StatusCodes.Status409Conflict)]
+        [SwaggerResponse(StatusCodes.Status404NotFound)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
         [HttpPost("createTaxInvoice")]
         public async Task<IActionResult> CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
@@ -64,7 +65,7 @@ namespace CRS.WebApi.Controllers
                 }
                 else
                 {  
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice");
+                    return StatusCode(StatusCodes.Status404NotFound, "Taxpayer not found");
                 }
                 
             }
