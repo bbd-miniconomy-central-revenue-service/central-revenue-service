@@ -6,7 +6,7 @@ using CRS.WebApi.Models;
 namespace CRS.WebApi.Services;
 
 public sealed class DebtCollectorBackgroundService(
-    ILogger<VerificationBackgroundService> logger, 
+    ILogger<PaymentVerificationService> logger, 
     UnitOfWork unitOfWork,
     HandOfZeusService commercialBankService) : IScopedProcessingService
 {
