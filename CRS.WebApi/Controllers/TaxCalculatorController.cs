@@ -22,9 +22,9 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpGet("calculate")]
-        public IActionResult CalculateTax(decimal amount, TaxType taxType)
+        public async Task<IActionResult> CalculateTax(decimal amount, TaxType taxType)
         {
-            var tax = _taxCalculator.CalculateTax(amount, taxType.ToString());
+            var tax = await _taxCalculator.CalculateTax(amount, taxType.ToString());
             return Ok(new { TaxableAmount = amount, TaxAmount = tax });
         }
     }   
