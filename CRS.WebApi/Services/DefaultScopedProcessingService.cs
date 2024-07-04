@@ -27,10 +27,6 @@ public sealed class DefaultScopedProcessingService(
         {
             await UpdateTaxRates();
 
-            _minuteCounter += 2;
-
-            await Task.Delay(_minute * 2, stoppingToken);
-
             if (_minuteCounter == 60)
             {
                 logger.LogInformation(
@@ -43,6 +39,10 @@ public sealed class DefaultScopedProcessingService(
 
                 _minuteCounter = 0;
             }
+
+            _minuteCounter += 2;
+
+            await Task.Delay(_minute * 2, stoppingToken);
         }
     }
 
