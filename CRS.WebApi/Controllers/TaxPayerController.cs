@@ -52,7 +52,7 @@ namespace CRS.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
             }
 
         }
@@ -86,7 +86,7 @@ namespace CRS.WebApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating tax invoice: " + ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
             }
         }
 

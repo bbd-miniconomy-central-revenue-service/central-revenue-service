@@ -36,7 +36,7 @@ namespace CRS.WebApi.Controllers
         {
             try
             {
-                var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
+                var tax = await _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
                 var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
                 
@@ -45,8 +45,9 @@ namespace CRS.WebApi.Controllers
                     var taxPayment = new TaxPayment
                     {
                         TaxPayerId = taxpayer.Id,  
-                        Amount = taxInvoiceRequest.Amount,
+                        Amount = tax,
                         TaxType = (int)taxInvoiceRequest.TaxType,
+                        Settled = false
                     };
 
                     _unitOfWork.TaxPaymentRepository.Create(taxPayment);

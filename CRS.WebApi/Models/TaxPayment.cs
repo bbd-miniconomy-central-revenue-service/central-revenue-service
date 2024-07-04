@@ -22,6 +22,9 @@ public partial class TaxPayment
     [Column("taxType")]
     public int TaxType { get; set; }
 
+    [Column("settled")]
+    public bool Settled { get; set; }
+
     [Column("created")]
     public DateTime? Created { get; set; }
 

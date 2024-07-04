@@ -2,7 +2,7 @@
 
 namespace CRS.WebApi.Data;
 
-public class Item
+public class Transaction
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = null!;
@@ -20,7 +20,7 @@ public class Item
 public class TranscationsData
 {
     [JsonPropertyName("items")]
-    public List<Item> Items { get; set; } = [];
+    public List<Transaction> Transactions { get; set; } = [];
 }
 
 public class TranscactionsResponse

@@ -1,20 +1,22 @@
 ﻿namespace CRS.WebApi.Services;
 using CRS.WebApi.Models;
+using CRS.WebApi.Repositories;
+
 public class TaxCalculatorFactory
 {
-    private CrsdbContext _context;
-    public TaxCalculatorFactory(CrsdbContext context)
+    private readonly UnitOfWork _unitOfWork;
+    public TaxCalculatorFactory(UnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 
-    public ICalculator GetTaxCalculator(string taxType)
+    public ICalculator<decimal, int> GetTaxCalculator(string taxType)
     {
         return taxType.ToLower() switch
         {
-            "property" => new PropertyTaxCalculator(_context),
-            "income" => new IncomeTaxCalculator(_context),
-            "vat" => new VatCalculator(_context),
+            "property" => new PropertyTaxCalculator(_unitOfWork),
+            "income" => new IncomeTaxCalculator(_unitOfWork),
+            "vat" => new VatCalculator(_unitOfWork),
             _ => throw new ArgumentException("Invalid tax type"),
         };
     }
