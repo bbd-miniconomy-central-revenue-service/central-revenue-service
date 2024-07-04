@@ -35,6 +35,8 @@ namespace CRS.WebApi.Controllers
         {
             try
             {
+                if (taxInvoiceRequest.Amount <= 0) return StatusCode(StatusCodes.Status400BadRequest, "Only positive amount values are allowed");
+
                 var tax = await _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
                 var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
