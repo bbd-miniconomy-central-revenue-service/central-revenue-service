@@ -43,7 +43,7 @@ namespace CRS.WebApi.Controllers
                 {
                     var unsettledPayments = await _unitOfWork.TaxPaymentRepository.GetUnsettledPaymentsByTaxPayerId(taxpayer.Id);
 
-                    if (unsettledPayments.Count > 1) return StatusCode(StatusCodes.Status406NotAcceptable, "Cannot have more than one unsettled payment");
+                    if (unsettledPayments.Count > 0) return StatusCode(StatusCodes.Status406NotAcceptable, "Cannot have more than one unsettled payment");
 
                     var taxPayment = new TaxPayment
                     {
