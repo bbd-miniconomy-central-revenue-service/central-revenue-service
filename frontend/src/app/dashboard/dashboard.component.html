@@ -6,10 +6,8 @@
     <div class="filters">
       <div class="filter-box" [class.selected]="filter === 'individuals'" (click)="selectFilter('individuals')">Individuals</div>
       <div class="filter-box" [class.selected]="filter === 'companies'" (click)="selectFilter('companies')">Companies</div>
-      <div class="filter-box" [class.selected]="filter === 'hasPaid'" (click)="selectFilter('hasPaid')">Has Paid</div>
-      <div class="filter-box" [class.selected]="filter === 'inArrears'" (click)="selectFilter('inArrears')">In Arrears</div>
-      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'vat'" (click)="selectSubFilter('vat')">VAT</div>
-      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'incomeTax'" (click)="selectSubFilter('incomeTax')">Income Tax</div>
+      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'VAT'" (click)="selectSubFilter('VAT')">VAT</div>
+      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'INCOME'" (click)="selectSubFilter('INCOME')">Income Tax</div>
     </div>
   
     <div class="dashboard-metrics">

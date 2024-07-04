@@ -15,9 +15,6 @@ class AuthGuard implements CanActivate {
 
   canActivate(): boolean {
 
-    // Define a function to handle code retrieval
-
-  // Parse the current URL to get parameters
   const urlParams = new URLSearchParams(window.location.search);
   
   // Check if 'code' parameter is present
@@ -35,6 +32,8 @@ class AuthGuard implements CanActivate {
           console.log(result);
           console.log("Access token is "+result['access_token']);
           localStorage.setItem('access_token',result['access_token']);
+          this.router.navigate(['/dashboard']);
+
         },
         (error) => {
           console.error(error);
@@ -43,32 +42,20 @@ class AuthGuard implements CanActivate {
       );
     }
     console.log("result is: "+result);
-    // Optionally, clear the URL parameters to avoid exposing the code in the URL
     window.history.replaceState({}, document.title, window.location.pathname);
     
-    // Example: Exchange code for tokens using a backend service
-    // exchangeCodeForTokens(code);
   } else {
-    // Handle the case where 'code' parameter is not present
     console.error('Authorization code not found.');
   }
 
     return true;
-    // const token = sessionStorage.getItem('accessToken');
-    // if (token) {
-    //   return true;
-    // } else {
-    //   this.router.navigate(['/login']);
-    //   return false;
-    // }
   }
 }
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   // { path: 'dashboard', component: DashboardComponent, pathMatch: 'full' },
   { path: 'home', component: HomeComponent, pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // Default route
   { path: '**', redirectTo: '/dashboard' } // Wildcard route for a 404 page
 ];

@@ -264,7 +264,7 @@ namespace CRS.WebApi.Migrations
                 {
                     b.Property<decimal>("AmountOwing")
                         .HasColumnType("money")
-                        .HasColumnName("AmountOwning");
+                        .HasColumnName("AmountOwing");
 
                     b.Property<int>("HasPaid")
                         .HasColumnType("int");
