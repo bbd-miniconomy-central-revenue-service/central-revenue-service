@@ -38,9 +38,13 @@ namespace CRS.WebApi.Controllers
                 var tax = await _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
                 var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
-                
+
                 if (taxpayer != null)
                 {
+                    var unsettledPayments = await _unitOfWork.TaxPaymentRepository.GetUnsettledPaymentsByTaxPayerId(taxpayer.Id);
+
+                    if (unsettledPayments.Count > 1) return StatusCode(StatusCodes.Status406NotAcceptable, "Cannot have more than one unsettled payment");
+
                     var taxPayment = new TaxPayment
                     {
                         TaxPayerId = taxpayer.Id,  
@@ -50,6 +54,14 @@ namespace CRS.WebApi.Controllers
                     };
 
                     _unitOfWork.TaxPaymentRepository.Create(taxPayment);
+
+                    if (taxpayer.Status == (int)Data.TaxStatus.INACTIVE)
+                    {
+                        taxpayer.Status = (int)Data.TaxStatus.ACTIVE;
+
+                        _unitOfWork.TaxPayerRepository.Update(taxpayer);
+                    }
+                     
                     _unitOfWork.Save();
 
                     return Ok(new TaxInvoice

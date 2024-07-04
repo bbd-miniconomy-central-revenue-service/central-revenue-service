@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
 using CRS.WebApi.Repositories;
+using CRS.WebApi.Services;
 
 namespace CRS.WebApi.Controllers
 {
