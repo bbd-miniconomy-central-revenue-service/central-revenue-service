@@ -5,8 +5,8 @@ namespace CRS.WebApi.Repositories;
 
 public interface IRepository<T, K> where T : class
 {
-    Task<IEnumerable<T>> All();
-    Task<T?> GetById(K id);
+    IEnumerable<T> All();
+    T? GetById(K id);
     void Create(T entity);
     void Update(T entity);
     void Delete(T entity);

@@ -16,9 +16,38 @@ public class HandOfZeusService
         httpClient.DefaultRequestHeaders.Add("X-Origin", "central_revenue");
     }
 
-    public async Task<TaxRateResponse?> GetTaxRates() =>
-        await _httpClient.GetFromJsonAsync<TaxRateResponse>("tax-rate");
+    public async Task<TaxRateResponse?> GetTaxRates() 
+    {
+        try 
+        {
+            return await _httpClient.GetFromJsonAsync<TaxRateResponse>("tax-rate");
+        }
+        catch (Exception) 
+        {
+            return new TaxRateResponse
+            {
+                Income = 10,
+                Vat = 12,
+                Property = 20
+            };
+        }
+        
+    }
+    
 
-    public async Task<StartSimulationResponse?> GetStartTime() =>
-        await _httpClient.GetFromJsonAsync<StartSimulationResponse>("start-time");
+    public async Task<StartSimulationResponse?> GetStartTime()
+    {
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<StartSimulationResponse>("start-time");
+        }
+        catch(Exception)
+        {
+            return new StartSimulationResponse
+            {
+                StartTime = "2024-07-05T07:33:16"
+            };
+        }
+    }
+        
 }

@@ -10,7 +10,8 @@ namespace CRS.WebApi.Services;
 
 public sealed class PaymentVerificationService(
     UnitOfWork unitOfWork,
-    CommercialBankService commercialBankService)
+    CommercialBankService commercialBankService,
+    ILogger<PaymentVerificationService> logger)
 {
     private readonly UnitOfWork _unitOfWork = unitOfWork;
     private readonly CommercialBankService _commercialBankService = commercialBankService;
@@ -25,7 +26,9 @@ public sealed class PaymentVerificationService(
         {
             _unitOfWork.TaxPaymentRepository.Update(payment);
             
-            taxpayer!.AmountOwing = amountShort;
+            if (amountShort > 0) taxpayer!.AmountOwing = amountShort;
+
+            taxpayer!.Updated = DateTime.UtcNow;
 
             _unitOfWork.TaxPayerRepository.Update(taxpayer!);
 
@@ -76,15 +79,19 @@ public sealed class PaymentVerificationService(
 
     public async Task<Tuple<TaxPayment?, decimal, TaxPayer?>> VerifyPayment(string taxId, int paymentId)
     {
+        logger.LogInformation(
+            "{ServiceName} verifying payments",
+            nameof(PaymentVerificationService)); 
+
         var transaction = await _commercialBankService.GetTransactionByRef(taxId);
 
         if (transaction == null) return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(default, 0, default);
 
-        var payment = await _unitOfWork.TaxPaymentRepository.GetById(paymentId);
+        var payment = _unitOfWork.TaxPaymentRepository.GetById(paymentId);
 
         if (payment == null) return Tuple.Create<TaxPayment?, decimal, TaxPayer?>(default, 0, default);
 
-        var taxpayer = await _unitOfWork.TaxPayerRepository.GetById(payment.TaxPayerId);
+        var taxpayer = _unitOfWork.TaxPayerRepository.GetById(payment.TaxPayerId);
 
         if (transaction.Amount >= payment.Amount)
         {

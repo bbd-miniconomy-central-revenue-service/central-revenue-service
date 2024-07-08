@@ -46,7 +46,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: originsKey,
         policy =>
         {
-            policy.WithOrigins(allowedOrigins)
+            policy.WithOrigins("*")
                 .WithMethods("GET")
                 .AllowAnyHeader();
         });
@@ -64,15 +64,8 @@ builder.Services.AddScoped<TaxCalculatorService>();
 
 builder.Services.AddScoped<PaymentVerificationService>();
 
-IConfiguration config = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", false, false)
-    .AddJsonFile($"appsettings.Production.json", true, true)
-    .AddEnvironmentVariables()
-    .Build();
-
 builder.Services.AddHttpClient<HandOfZeusService>();
-builder.Services.AddHttpClient<PersonaService>();
+builder.Services.AddHttpClient<IPersonaService, PersonaServiceMock>();
 builder.Services.AddHttpClient<CommercialBankService>();
 
 var app = builder.Build();
@@ -103,7 +96,8 @@ app.UseOriginWhitelist([
     "short_term_lender",
     "home_loans",
     "electronics_retailer",
-    "food_retailer"
+    "food_retailer",
+    "zeus"
     ]);
 
 app.MapControllers();

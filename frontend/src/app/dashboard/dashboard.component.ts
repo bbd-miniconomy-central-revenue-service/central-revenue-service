@@ -72,6 +72,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getAmountCollected(): number {
-    return this.filteredData.filter(data => data.hasPaid === 1).reduce((acc, curr) => acc + curr.amountOwing, 0);
+    return this.filteredData.filter(data => data.hasPaid === 1).reduce((acc, curr) => acc + curr.paymentAmount, 0);
   }
 }

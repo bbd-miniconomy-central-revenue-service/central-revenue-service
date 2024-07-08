@@ -19,4 +19,7 @@ public class TaxRecordsResponse
     [JsonPropertyName("taxType")]
     public string? TaxType { get; set; }
 
+    [JsonPropertyName("paymentAmount")]
+    public decimal PaymentAmount { get; set; }
+
 }

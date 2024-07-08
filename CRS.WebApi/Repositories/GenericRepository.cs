@@ -10,7 +10,7 @@ public abstract class GenericRepository<T, K>(
     protected CrsdbContext _context = context;
     internal DbSet<T> dbSet = context.Set<T>();
 
-    public virtual async Task<IEnumerable<T>> All() => await dbSet.ToListAsync();
+    public virtual IEnumerable<T> All() => [.. dbSet];
 
    public virtual async void Create(T entity)
     {
@@ -28,7 +28,7 @@ public abstract class GenericRepository<T, K>(
 
     public virtual async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate) => await dbSet.Where(predicate).ToListAsync();
 
-    public async Task<T?> GetById(K id) => await dbSet.FindAsync(id);
+    public T? GetById(K id) => dbSet.Find(id);
 
     public virtual void Update(T entity)
     {

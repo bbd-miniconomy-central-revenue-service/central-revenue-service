@@ -12,4 +12,7 @@ public class TaxRecord
     [Column("AmountOwing", TypeName = "money")]
     public decimal AmountOwing { get; set; }
     public string? TaxType { get; set; }
+
+    [Column("PaymentAmount", TypeName = "money")]
+    public decimal PaymentAmount { get; set; }
 }

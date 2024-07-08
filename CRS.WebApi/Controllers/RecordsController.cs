@@ -19,11 +19,11 @@ namespace CRS.WebApi.Controllers
         // GET: api/records/history
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("history")]
-        public async Task<ActionResult<TaxRecordsResponse>> GetTaxHistory()
+        public ActionResult<TaxRecordsResponse> GetTaxHistory()
         {
             try 
             {
-                var history = await _unitOfWork.TaxRecordViewRepository.GetRecords();
+                var history = _unitOfWork.TaxRecordViewRepository.GetRecords();
                 
                 if (history != null)
                 {
@@ -34,8 +34,8 @@ namespace CRS.WebApi.Controllers
                             Type = Enum.GetName(typeof(TaxPayerType), tr.TaxPayerType),
                             HasPaid = tr.HasPaid,
                             AmountOwing = tr.AmountOwing,
-                            TaxType = tr.TaxType
-
+                            TaxType = tr.TaxType,
+                            PaymentAmount = tr.PaymentAmount
                         }).ToList()
                     );
 

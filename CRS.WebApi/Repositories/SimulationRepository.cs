@@ -6,9 +6,9 @@ namespace CRS.WebApi.Repositories;
 
 public class SimulationRepository(CrsdbContext context) : GenericRepository<Simulation, int>(context) 
 {
-    public async Task<Simulation?> GetLatestSimulation()
+    public Simulation? GetLatestSimulation()
     {
-        var allRecords = await All();
+        var allRecords = All();
         return allRecords.LastOrDefault();
     }
 }

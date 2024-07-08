@@ -15,10 +15,10 @@ namespace CRS.WebApi.Controllers
 {
     [Route("api/simulation")]
     [ApiController]
-    public class SimluationController(UnitOfWork unitOfWork, PersonaService personaService) : ControllerBase
+    public class SimluationController(UnitOfWork unitOfWork, IPersonaService personaService) : ControllerBase
     {
         private readonly UnitOfWork _unitOfWork = unitOfWork;
-        private readonly PersonaService _personaService = personaService;
+        private readonly IPersonaService _personaService = personaService;
 
         // POST: api/simulation/startNewSimulation
         [SwaggerOperation(Summary = "API endpoint to start a new simulation")]
@@ -28,9 +28,10 @@ namespace CRS.WebApi.Controllers
         [HttpPost("startNewSimulation")]
         public async Task<IActionResult> StartNewSimulation(StartSimulationRequest startSimulationRequest)
         {
-            var simulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+            var simulation = _unitOfWork.SimulationRepository.GetLatestSimulation();
 
-            if (startSimulationRequest.Action == Data.Action.start || simulation == null) {
+            if (startSimulationRequest.Action == Data.Action.start || simulation == null)
+            {
                 simulation = new Simulation
                 {
                     StartTime = DateTime.Parse(startSimulationRequest.StartTime!),

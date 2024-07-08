@@ -30,6 +30,7 @@ namespace CRS.WebApi.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status406NotAcceptable)]
         [HttpPost("createTaxInvoice")]
         public async Task<IActionResult> CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
@@ -37,7 +38,7 @@ namespace CRS.WebApi.Controllers
             {
                 if (taxInvoiceRequest.Amount <= 0) return StatusCode(StatusCodes.Status400BadRequest, "Only positive amount values are allowed");
 
-                var tax = await _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
+                var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
                 var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
 
