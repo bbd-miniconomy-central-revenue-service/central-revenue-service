@@ -1,41 +1,64 @@
-<mat-toolbar color="primary">
-    Revenue Service Analytics
-  </mat-toolbar>
-  
-  <div class="dashboard-container">
-    <div class="filters">
-      <div class="filter-box" [class.selected]="filter === 'individuals'" (click)="selectFilter('individuals')">Individuals</div>
-      <div class="filter-box" [class.selected]="filter === 'companies'" (click)="selectFilter('companies')">Companies</div>
-      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'VAT'" (click)="selectSubFilter('VAT')">VAT</div>
-      <div class="filter-box" *ngIf="filter === 'companies'" [class.selected]="subFilter === 'INCOME'" (click)="selectSubFilter('INCOME')">Income Tax</div>
+<mat-toolbar color="primary"> Revenue Service Analytics </mat-toolbar>
+
+<div class="dashboard-container">
+  <div class="filters">
+    <div
+      class="filter-box"
+      [class.selected]="filter === 'individuals'"
+      (click)="selectFilter('individuals')"
+    >
+      Individuals
     </div>
-  
-    <div class="dashboard-metrics">
-      <mat-card class="metric-card">
-        <mat-card-header>
-          <mat-card-title>Number of Tax Payers</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <h2>{{ filteredData.length }}</h2>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-header>
-          <mat-card-title>Number of Tax Payers Who Have Not Paid</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <h2>{{ getPaidTaxPayersCount() }}</h2>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-header>
-          <mat-card-title>Amount Collected</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <h2>{{ getAmountCollected() | currency: 'BBD$' }}</h2>
-        </mat-card-content>
-      </mat-card>
+    <div
+      class="filter-box"
+      [class.selected]="filter === 'companies'"
+      (click)="selectFilter('companies')"
+    >
+      Companies
+    </div>
+    <div
+      class="filter-box"
+      *ngIf="filter === 'companies'"
+      [class.selected]="subFilter === 'VAT'"
+      (click)="selectSubFilter('VAT')"
+    >
+      VAT
+    </div>
+    <div
+      class="filter-box"
+      *ngIf="filter === 'companies'"
+      [class.selected]="subFilter === 'INCOME'"
+      (click)="selectSubFilter('INCOME')"
+    >
+      Income Tax
     </div>
   </div>
-  <app-search></app-search>
-  
+
+  <div class="dashboard-metrics">
+    <mat-card class="metric-card">
+      <mat-card-header>
+        <mat-card-title>Number of Tax Payers</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ filteredData.length }}</h2>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="metric-card">
+      <mat-card-header>
+        <mat-card-title>Number of Tax Payers Who Have Paid</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ getPaidTaxPayersCount() }}</h2>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="metric-card">
+      <mat-card-header>
+        <mat-card-title>Amount Collected</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2>{{ getAmountCollected() | currency : "BBD$" }}</h2>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<app-search></app-search>

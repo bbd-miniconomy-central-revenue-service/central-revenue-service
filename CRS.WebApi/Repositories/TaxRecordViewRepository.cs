@@ -5,8 +5,8 @@ namespace CRS.WebApi.Repositories;
 
 public class TaxRecordViewRepository(CrsdbContext context) : GenericRepository<TaxRecord, long>(context)
 {
-    public async Task<IEnumerable<TaxRecord>> GetRecords()
+    public IEnumerable<TaxRecord> GetRecords()
     {
-        return await All();
+        return All();
     }
 }

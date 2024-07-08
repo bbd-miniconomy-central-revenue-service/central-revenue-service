@@ -17,9 +17,10 @@ export class RevenueService {
 
   searchTaxPayers(id: string, filter: string, subFilter: string): any[] {
     let results = this.taxPayers;
+    this.filteredData = this.historyData;
 
     if (id) {
-      this.filteredData =this.filteredData.filter(t => t.id === id); // Exact match on ID
+      this.filteredData =this.filteredData.filter(t => t.id === id.toLowerCase()); // Exact match on ID
     }
 
     if (filter === 'individuals') {

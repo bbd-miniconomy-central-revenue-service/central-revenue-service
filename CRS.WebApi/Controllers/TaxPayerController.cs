@@ -103,7 +103,7 @@ namespace CRS.WebApi.Controllers
         [HttpPost("business/register")]
         public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
-            var latestSimulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+            var latestSimulation = _unitOfWork.SimulationRepository.GetLatestSimulation();
 
             if (latestSimulation == null)
             {
@@ -129,7 +129,7 @@ namespace CRS.WebApi.Controllers
                 return Ok(
                     new TaxIdResponse
                     {
-                        TaxId = Guid.NewGuid()
+                        TaxId = newTaxPayer.TaxPayerId
                     }
                );
             }

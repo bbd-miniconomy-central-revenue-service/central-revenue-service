@@ -3,7 +3,7 @@
     public interface ICalculator<T, K>
     {
         T CalculateTax(T amount, K rate);
-        Task<T> CalculateTaxWithRateFromDb(T amount, int taxTypeId);
+        T CalculateTaxWithRateFromDb(T amount, int taxTypeId);
     }
 }
 

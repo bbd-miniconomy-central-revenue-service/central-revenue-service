@@ -5,44 +5,53 @@ using CRS.WebApi.Models;
 
 namespace CRS.WebApi.Services;
 
-public sealed class DefaultScopedProcessingService(
-    ILogger<DefaultScopedProcessingService> logger, 
-    UnitOfWork unitOfWork,
-    HandOfZeusService handOfZeusService,
-    PersonaService personaService,
-    CommercialBankService commercialBakingService) : IScopedProcessingService
+public sealed class DefaultScopedProcessingService : IScopedProcessingService
 {
-    private readonly UnitOfWork _unitOfWork = unitOfWork;
-    private readonly HandOfZeusService _handOfZeusService = handOfZeusService;
-    private readonly PersonaService _personaService = personaService;
-    private readonly CommercialBankService _commercialBankService = commercialBakingService;
-    private readonly int _minute = 60_0000;
-    private int _minuteCounter = 0;
+    private readonly ILogger<DefaultScopedProcessingService> logger;
+    private readonly UnitOfWork _unitOfWork;
+    private readonly HandOfZeusService _handOfZeusService;
+    private readonly IPersonaService _personaService;
+    private readonly CommercialBankService _commercialBankService;
+    private DateTime _currentTimestamp;
+    private DateTime _startTime;
 
+    public DefaultScopedProcessingService(IServiceScopeFactory serviceScopeFactory)
+    {
+        IServiceScope scope = serviceScopeFactory.CreateScope();
+        logger = scope.ServiceProvider.GetRequiredService<ILogger<DefaultScopedProcessingService>>();
+        _unitOfWork = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+        _handOfZeusService = scope.ServiceProvider.GetRequiredService<HandOfZeusService>();
+        _personaService = scope.ServiceProvider.GetRequiredService<IPersonaService>();
+        _commercialBankService = scope.ServiceProvider.GetRequiredService<CommercialBankService>();
+    }
+ 
     public async Task DoWorkAsync(CancellationToken stoppingToken)
     {
         await UpdateSimulation();
 
+        await UpdateTaxRates();
+
+        _currentTimestamp = DateTime.UtcNow;
+
         while (!stoppingToken.IsCancellationRequested)
         {
-            await UpdateTaxRates();
-
-            if (_minuteCounter == 60)
+            if ((long)_currentTimestamp.Subtract(_startTime).TotalMinutes % 2 == 0 && 
+                (long)_currentTimestamp.Subtract(_startTime).TotalMinutes >= 2)
             {
                 logger.LogInformation(
                     "{ServiceName} settling payments",
                     nameof(DefaultScopedProcessingService));
 
+                await UpdateTaxRates();
+
                 await SettlePayments();
 
-                await _commercialBankService.MakePayment("labour-broker");
+                _commercialBankService.MakePayment("labour-broker");
 
-                _minuteCounter = 0;
+                _startTime = _currentTimestamp;
             }
 
-            _minuteCounter += 2;
-
-            await Task.Delay(_minute * 2, stoppingToken);
+            _currentTimestamp = DateTime.UtcNow;
         }
     }
 
@@ -52,9 +61,9 @@ public sealed class DefaultScopedProcessingService(
 
         if (taxRateResponse != null)
         {
-            var vat = await _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.VAT);
-            var income = await _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.INCOME);
-            var property = await _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.PROPERTY);
+            var vat = _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.VAT);
+            var income = _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.INCOME);
+            var property = _unitOfWork.TaxTypeRepository.GetById((int)Data.TaxType.PROPERTY);
 
             if (taxRateResponse.Vat != null) vat!.Rate = (int)taxRateResponse.Vat;
             if (taxRateResponse.Income != null) income!.Rate = (int)taxRateResponse.Income;
@@ -72,7 +81,7 @@ public sealed class DefaultScopedProcessingService(
 
         if (startTime != null)
         {
-            var latestSimulation = await _unitOfWork.SimulationRepository.GetLatestSimulation();
+            var latestSimulation = _unitOfWork.SimulationRepository.GetLatestSimulation();
 
             if (latestSimulation == null || DateTime.Compare((DateTime)startTime, latestSimulation.StartTime) > 0)
             {
@@ -109,6 +118,8 @@ public sealed class DefaultScopedProcessingService(
                 }
 
                 _unitOfWork.Save();
+
+                _startTime = simulation.StartTime;
             }
         }
     }
@@ -125,25 +136,40 @@ public sealed class DefaultScopedProcessingService(
         return default;
     }
 
+    public async Task UpdateTaxPayerBalance(List<TaxPayer> taxpayers)
+    {
+        foreach (var taxpayer in taxpayers)
+        {
+            if (taxpayer.Group == (int)Data.TaxPayerType.BUSINESS)
+            {
+                var result = _commercialBankService.CreateDebitOrder(taxpayer.Name!.Replace("_", "-"), taxpayer.AmountOwing);
+
+                if (result.Result == "success")
+                {
+                    var taxPayment = (await _unitOfWork.TaxPaymentRepository.GetUnsettledPayments()).FirstOrDefault();
+                    
+                    taxpayer.AmountOwing = 0;
+                    taxpayer.Updated = DateTime.UtcNow;
+
+                    _unitOfWork.TaxPayerRepository.Update(taxpayer);
+
+                    if (taxPayment != null)
+                    {
+                        taxPayment!.Settled = true;
+                        _unitOfWork.TaxPaymentRepository.Update(taxPayment);
+                    }
+                }
+            }
+        }
+    }
     public async Task SettlePayments()
     {
         var taxpayersInDebt = await _unitOfWork.TaxPayerRepository.GetOwingTaxPayers();
         var surplusTaxpayers = await _unitOfWork.TaxPayerRepository.GetSurplusTaxPayers();
 
-        foreach (var taxpayer in taxpayersInDebt)
-        {
-            if (taxpayer.Group == (int)Data.TaxPayerType.BUSINESS)
-            {
-                await _commercialBankService.CreateDebitOrder(taxpayer.Name!.Replace("_", "-"), taxpayer.AmountOwing);
-            }
-        }
+        await UpdateTaxPayerBalance(taxpayersInDebt);
+        await UpdateTaxPayerBalance(surplusTaxpayers);
 
-        foreach (var taxpayer in surplusTaxpayers)
-        {
-            if (taxpayer.Group == (int)Data.TaxPayerType.BUSINESS)
-            {
-                await _commercialBankService.MakePayment(taxpayer.Name!.Replace("_", "-"), -taxpayer.AmountOwing);
-            }
-        }
+        _unitOfWork.Save();
     }
 }

@@ -11,9 +11,9 @@ public class TaxCalculatorService
         _taxCalculatorFactory = taxCalculatorFactory;
     }
 
-    public async Task<decimal> CalculateTax(decimal amount, string taxType)
+    public decimal CalculateTax(decimal amount, string taxType)
     {
         ICalculator<decimal, int> calculator = _taxCalculatorFactory.GetTaxCalculator(taxType);
-        return await calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(Data.TaxType), taxType.ToUpper()));
+        return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(Data.TaxType), taxType.ToUpper()));
     }
 }
