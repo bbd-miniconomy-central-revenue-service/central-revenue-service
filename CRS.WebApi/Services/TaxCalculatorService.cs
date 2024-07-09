@@ -13,7 +13,7 @@ public class TaxCalculatorService
 
     public decimal CalculateTax(decimal amount, string taxType)
     {
-        ICalculator calculator = _taxCalculatorFactory.GetTaxCalculator(taxType);
+        ICalculator<decimal, int> calculator = _taxCalculatorFactory.GetTaxCalculator(taxType);
         return calculator.CalculateTaxWithRateFromDb(amount, (int)Enum.Parse(typeof(Data.TaxType), taxType.ToUpper()));
     }
 }

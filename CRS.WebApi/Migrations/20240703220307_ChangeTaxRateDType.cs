@@ -1,34 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using CRS.WebApi.Data;
 
 #nullable disable
 
 namespace CRS.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class SetDefaultValueForTaxStatusFix : Migration
+    public partial class ChangeTaxRateDType : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
-                name: "status",
-                table: "TaxPayer",
+                name: "rate",
+                table: "TaxType",
                 type: "int",
-                defaultValue: (int)TaxStatus.INACTIVE);
+                nullable: false,
+                oldClrType: typeof(decimal),
+                oldType: "decimal(5,5)");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "status",
-                table: "TaxPayer",
-                type: "int",
+            migrationBuilder.AlterColumn<decimal>(
+                name: "rate",
+                table: "TaxType",
+                type: "decimal(5,5)",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int",
-                oldDefaultValue: (int)TaxStatus.INACTIVE);
+                oldType: "int");
         }
     }
 }

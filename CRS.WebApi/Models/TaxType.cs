@@ -19,8 +19,8 @@ public partial class TaxType
     [Column("created")]
     public DateTime? Created { get; set; }
 
-    [Column("rate", TypeName = "decimal(5, 5)")]
-    public decimal Rate { get; set; }
+    [Column("rate", TypeName = "int")]
+    public int Rate { get; set; }
 
     [InverseProperty("TaxTypeNavigation")]
     public virtual ICollection<TaxPayment> TaxPayments { get; set; } = [];

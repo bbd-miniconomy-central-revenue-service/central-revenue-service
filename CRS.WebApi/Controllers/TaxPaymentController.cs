@@ -9,52 +9,76 @@ using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
 using CRS.WebApi.Services;
+using CRS.WebApi.Repositories;
 
 namespace CRS.WebApi.Controllers
 {
     [Route("api/taxpayment")]
     [ApiController]
-    public class TaxPaymentController : ControllerBase
+    public class TaxPaymentController(
+        TaxCalculatorService taxCalculator, 
+        UnitOfWork unitOfWork, 
+        PaymentVerificationService paymentVerificationService) : ControllerBase
     {
-        private readonly CrsdbContext _context;
-        private readonly TaxCalculatorService _taxCalculator;
-        private readonly PaymentService _paymentService;
-
-        public TaxPaymentController(CrsdbContext context, TaxCalculatorService taxCalculator, PaymentService paymentService)
-        {
-            _context = context;
-            _taxCalculator = taxCalculator;
-            _paymentService = paymentService;
-        }
+        private readonly TaxCalculatorService _taxCalculator = taxCalculator;
+        private readonly UnitOfWork _unitOfWork = unitOfWork;
+        private readonly PaymentVerificationService _paymentVerificationService = paymentVerificationService;
 
         // POST: api/taxPayment/createTaxInvoice
         [SwaggerOperation(Summary = "Creates a tax payment record and sends back an invoice")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxInvoice))]
-        [SwaggerResponse(StatusCodes.Status409Conflict)]
+        [SwaggerResponse(StatusCodes.Status404NotFound)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status406NotAcceptable)]
         [HttpPost("createTaxInvoice")]
-        public IActionResult CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
+        public async Task<IActionResult> CreateTaxInvoice(TaxInvoiceRequest taxInvoiceRequest)
         {
             try
             {
+                if (taxInvoiceRequest.Amount <= 0) return StatusCode(StatusCodes.Status400BadRequest, "Only positive amount values are allowed");
+
                 var tax = _taxCalculator.CalculateTax(taxInvoiceRequest.Amount, taxInvoiceRequest.TaxType.ToString());
 
-                long paymentId = _paymentService.CreatePayment(taxInvoiceRequest);
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxInvoiceRequest.TaxId);
 
-                var taxInvoice = new TaxInvoice
+                if (taxpayer != null)
                 {
-                    PaymentId = paymentId,
-                    AmountDue = tax,
-                    DueTime = new DueTime
-                    {
-                        Days = 10,
-                        Hours = 2,
-                        Minutes = 2,
-                        Seconds = 2
-                    }
-                };
+                    var unsettledPayments = await _unitOfWork.TaxPaymentRepository.GetUnsettledPaymentsByTaxPayerId(taxpayer.Id);
 
-                return Ok(taxInvoice);
+                    if (unsettledPayments.Count > 0) return StatusCode(StatusCodes.Status406NotAcceptable, "Cannot have more than one unsettled payment");
+
+                    var taxPayment = new TaxPayment
+                    {
+                        TaxPayerId = taxpayer.Id,  
+                        Amount = tax,
+                        TaxType = (int)taxInvoiceRequest.TaxType,
+                        Settled = false
+                    };
+
+                    _unitOfWork.TaxPaymentRepository.Create(taxPayment);
+
+                    if (taxpayer.Status == (int)Data.TaxStatus.INACTIVE)
+                    {
+                        taxpayer.Status = (int)Data.TaxStatus.ACTIVE;
+
+                        _unitOfWork.TaxPayerRepository.Update(taxpayer);
+                    }
+                     
+                    _unitOfWork.Save();
+
+                    return Ok(new TaxInvoice
+                    {
+                        PaymentId = taxPayment.Id,
+                        AmountDue = tax,
+                    });
+
+                }
+                else
+                {  
+                    return StatusCode(StatusCodes.Status404NotFound, "Taxpayer not found");
+                }
+                
             }
             catch (Exception ex)
             {
@@ -64,15 +88,13 @@ namespace CRS.WebApi.Controllers
 
         // POST: api/taxPayment/submitNoticeOfPayment
         [SwaggerOperation(Summary = "Verifies that payment has been made and updates the corresponding payment record. A VerificationRequest is sent to the callback URL with the results.")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(NoticeOfPaymentResponse))]
+        [SwaggerResponse(StatusCodes.Status202Accepted, Type = typeof(NoticeOfPaymentResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("submitNoticeOfPayment")]
         public IActionResult SubmitNoticeOfPayment(NoticeOfPaymentRequest noticeOfPaymentRequest)
         {
-            return Ok(
-                new NoticeOfPaymentResponse
-                {
-                    Result = "success"
-                });
+            _ = _paymentVerificationService.UpdatePayment(noticeOfPaymentRequest);
+            return StatusCode(StatusCodes.Status202Accepted, "Processing request");
         }
     }
 }

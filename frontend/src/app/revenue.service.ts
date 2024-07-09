@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HistoryService } from './services/history.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -6,43 +8,52 @@ import { Injectable } from '@angular/core';
 export class RevenueService {
   private taxPayers = this.generateDummyData();
 
-  constructor() { }
+  private historySubscription: Subscription | undefined;
+
+  historyData: any[] = [];
+  filteredData: any[] = [];
+
+  constructor(private historyService: HistoryService) { }
 
   searchTaxPayers(id: string, filter: string, subFilter: string): any[] {
     let results = this.taxPayers;
+    this.filteredData = this.historyData;
 
     if (id) {
-      results = results.filter(t => t.id === id); // Exact match on ID
+      this.filteredData =this.filteredData.filter(t => t.id === id.toLowerCase()); // Exact match on ID
     }
 
     if (filter === 'individuals') {
-      results = results.filter(t => t.type === 'individual');
+      this.filteredData = this.filteredData.filter(data => data.type === 'INDIVIDUAL');
     } else if (filter === 'companies') {
-      results = results.filter(t => t.type === 'company');
+      this.filteredData = this.filteredData.filter(data => data.type === 'BUSINESS');
       if (subFilter) {
-        results = results.filter(t => t.taxType === subFilter);
+        console.log("subfilter value is: "+subFilter);
+        this.filteredData = this.filteredData.filter(data => data.taxType === subFilter.toUpperCase());
       }
     } else if (filter === 'hasPaid') {
-      results = results.filter(t => t.hasPaid);
+      this.filteredData = this.filteredData.filter(data => data.hasPaid === 1);
     } else if (filter === 'inArrears') {
-      results = results.filter(t => !t.hasPaid);
+      this.filteredData = this.filteredData.filter(data => data.hasPaid === 0);
     }
 
-    return results;
+    return this.filteredData;
   }
 
   generateDummyData() {
-    const data = [];
-    for (let i = 1; i <= 100; i++) {
-      const isCompany = i % 2 === 0;
-      data.push({
-        id: i.toString(),
-        type: isCompany ? 'company' : 'individual',
-        hasPaid: Math.random() > 0.5,
-        amountPaid: Math.random() * 10000,
-        taxType: isCompany ? (Math.random() > 0.5 ? 'vat' : 'incomeTax') : ''
-      });
-    }
-    return data;
+    this.historySubscription = this.historyService.getHistory().subscribe(
+      (data) => {
+        // Ensure data is parsed as JSON if it's a string
+        if (typeof data === 'string') {
+          this.historyData = JSON.parse(data);
+        } else {
+          this.historyData = data;
+        }
+        this.filteredData = this.historyData; // Initialize filteredData with historyData
+      },
+      (error) => {
+        console.error('Error fetching history data:', error);
+      }
+    );
   }
 }

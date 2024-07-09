@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    [Migration("20240702233503_SeedData")]
-    partial class SeedData
+    [Migration("20240703220307_ChangeTaxRateDType")]
+    partial class ChangeTaxRateDType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -222,8 +222,8 @@ namespace CRS.WebApi.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("description");
 
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(5, 5)")
+                    b.Property<int>("Rate")
+                        .HasColumnType("int")
                         .HasColumnName("rate");
 
                     b.HasKey("Id")
@@ -261,6 +261,28 @@ namespace CRS.WebApi.Migrations
                         .HasFilter("[email] IS NOT NULL");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("CRS.WebApi.TaxRecord", b =>
+                {
+                    b.Property<decimal>("AmountOwing")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("HasPaid")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TaxId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TaxPayerType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TaxType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("TaxRecordView", (string)null);
                 });
 
             modelBuilder.Entity("CRS.WebApi.Models.TaxPayer", b =>

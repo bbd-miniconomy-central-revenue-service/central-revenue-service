@@ -36,4 +36,4 @@ jobs:
 
       - name: Deploy
         if: success()
-        run: aws s3 sync "${{ github.workspace }}/frontend/dist/my_first_angular" ${{ env.AWS_BUCKET }}
+        run: aws s3 sync "${{ github.workspace }}/frontend/dist/Central_Revenue_Service" ${{ env.AWS_BUCKET }}

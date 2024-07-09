@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CRS.WebApi.Migrations
 {
     [DbContext(typeof(CrsdbContext))]
-    [Migration("20240703000707_SetDefaultValueForTaxStatusFix")]
-    partial class SetDefaultValueForTaxStatusFix
+    [Migration("20240707233632_ChangedUserTable")]
+    partial class ChangedUserTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,7 +81,6 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("simulationId");
 
                     b.Property<int>("Status")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("int")
                         .HasColumnName("status");
 
@@ -161,6 +160,10 @@ namespace CRS.WebApi.Migrations
                         .HasColumnName("created")
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<bool>("Settled")
+                        .HasColumnType("bit")
+                        .HasColumnName("settled");
+
                     b.Property<long>("TaxPayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("taxPayerID");
@@ -223,8 +226,8 @@ namespace CRS.WebApi.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("description");
 
-                    b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(5, 5)")
+                    b.Property<int>("Rate")
+                        .HasColumnType("int")
                         .HasColumnName("rate");
 
                     b.HasKey("Id")
@@ -254,6 +257,12 @@ namespace CRS.WebApi.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("email");
 
+                    b.Property<string>("UserPicUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id")
                         .HasName("PK_UserId");
 
@@ -262,6 +271,33 @@ namespace CRS.WebApi.Migrations
                         .HasFilter("[email] IS NOT NULL");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("CRS.WebApi.TaxRecord", b =>
+                {
+                    b.Property<decimal>("AmountOwing")
+                        .HasColumnType("money")
+                        .HasColumnName("AmountOwing");
+
+                    b.Property<int>("HasPaid")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PaymentAmount")
+                        .HasColumnType("money")
+                        .HasColumnName("PaymentAmount");
+
+                    b.Property<Guid>("TaxId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TaxPayerType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TaxType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("TaxRecordView", (string)null);
                 });
 
             modelBuilder.Entity("CRS.WebApi.Models.TaxPayer", b =>

@@ -1,0 +1,34 @@
+@startuml simulation
+
+participant "Hand of Zeus Service" as Zeus
+participant "Revenue Service" as Revenue
+participant "Commercial Bank Service" as Bank
+participant "Persona Service" as Persona
+
+== Start of the Simulation ==
+Zeus -> Zeus: /api/simulation/startSimulation
+Zeus -> Revenue: 200 OK (startTime)
+
+Revenue -> Revenue: Reset internal database
+
+Revenue -> Zeus: GET /api/taxRates
+Zeus -> Revenue: 200 OK (latestTaxRates)
+
+Revenue -> Persona: GET /api/Persona/getAllPersonas
+Persona -> Revenue: 200 OK (personasList)
+
+loop Every 2 minutes from startTime
+    Revenue -> Zeus: GET /api/taxRates
+    Zeus -> Revenue: 200 OK (updatedTaxRates)
+
+    Revenue -> Bank: POST /createDebitOrder (pendingPayments)
+    Bank -> Revenue: 200 OK
+
+    Revenue -> Bank: POST /createTransaction (refunds)
+    Bank -> Revenue: 200 OK
+
+    Revenue -> Bank: POST /createTransaction (Labour Service payment)
+    Bank -> Revenue: 200 OK
+end
+
+@enduml

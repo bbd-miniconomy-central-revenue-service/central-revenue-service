@@ -9,41 +9,62 @@ using Swashbuckle.AspNetCore.Annotations;
 using CRS.WebApi.Models;
 using CRS.WebApi.Data;
 using CRS.WebApi.Repositories;
+using CRS.WebApi.Services;
 
 namespace CRS.WebApi.Controllers
 {
     [Route("api/simulation")]
     [ApiController]
-    public class SimluationController : ControllerBase
+    public class SimluationController(UnitOfWork unitOfWork, IPersonaService personaService) : ControllerBase
     {
-        private readonly UnitOfWork _unitOfWork;
-
-        public SimluationController(UnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly UnitOfWork _unitOfWork = unitOfWork;
+        private readonly IPersonaService _personaService = personaService;
 
         // POST: api/simulation/startNewSimulation
         [SwaggerOperation(Summary = "API endpoint to start a new simulation")]
-        [SwaggerResponse(StatusCodes.Status200OK)]
+        [SwaggerResponse(StatusCodes.Status204NoContent)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpPost("startNewSimulation")]
-        public IActionResult startNewSimulation(StartSimulationRequest startSimulationRequest)
+        public async Task<IActionResult> StartNewSimulation(StartSimulationRequest startSimulationRequest)
         {
-            if (startSimulationRequest.Action == Data.Action.start) {
-                _unitOfWork.SimulationRepository.Create(
-                    new Simulation
-                    {
-                        StartTime = DateTime.Parse(startSimulationRequest.StartTime!),
-                    });
-            } 
-            else
+            var simulation = _unitOfWork.SimulationRepository.GetLatestSimulation();
+
+            if (startSimulationRequest.Action == Data.Action.start || simulation == null)
             {
-                // TODO: truncate all the tables
-                return NoContent();
+                simulation = new Simulation
+                {
+                    StartTime = DateTime.Parse(startSimulationRequest.StartTime!),
+                };
+
+                _unitOfWork.SimulationRepository.Create(simulation);
+                _unitOfWork.Save();
             }
 
-            _unitOfWork.Save();
+            _unitOfWork.TaxPaymentRepository.DeleteAll();
+            _unitOfWork.TaxPayerRepository.DeleteAll();
+
+            var personas = await _personaService.GetPersonaList();
+
+            if (startSimulationRequest.Action == Data.Action.start)
+            {
+                foreach (var persona in personas)
+                {
+                    if (persona.Adult)
+                    {
+                        _unitOfWork.TaxPayerRepository.Create(new TaxPayer
+                        {
+                            PersonaId = persona.Id,
+                            SimulationId = simulation.Id,
+                            AmountOwing = 0,
+                            Group = (int)Data.TaxPayerType.INDIVIDUAL,
+                            Status = (int)Data.TaxStatus.INACTIVE
+                        });
+                    }
+                }
+
+                _unitOfWork.Save();
+            }
 
             return NoContent();
         }

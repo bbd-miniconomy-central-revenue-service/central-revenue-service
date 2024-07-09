@@ -27,60 +27,154 @@ namespace CRS.WebApi.Controllers
         [SwaggerOperation(Summary = "Gets the taxID for a persona")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [HttpGet("persona/getTaxId/{personaId}")]
-        public ActionResult<TaxIdResponse> GetPersonaTaxId(long personaId)
+        public async Task<ActionResult<TaxIdResponse>> GetPersonaTaxId(long personaId)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByPersonaId(personaId);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
+            }
+
         }
 
         // GET: api/taxPayer/business/getTaxNUmber
         [SwaggerOperation(Summary = "Gets the taxID for a business.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpGet("business/getTaxId/{businessName}")]
-        public ActionResult<TaxIdResponse> GetBusinessTaxId(string businessName)
+        public async Task<ActionResult<TaxIdResponse>> GetBusinessTaxId(string businessName)
         {
-            return Ok(
-                new TaxIdResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByName(businessName);
+
+                if (taxpayer != null)
                 {
-                    TaxId = Guid.NewGuid()
+                    return Ok(
+                        new TaxIdResponse
+                        {
+                            TaxId = taxpayer.TaxPayerId
+                        }
+                    );
+
                 }
-           );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
+            }
         }
 
         // POST: api/taxPayer/business/register
         [SwaggerOperation(Summary = "Registers a business and assigns it a taxID.")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxIdResponse))]
-        [SwaggerResponse(StatusCodes.Status409Conflict)]
+        [SwaggerResponse(StatusCodes.Status416RangeNotSatisfiable)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpPost("business/register")]
-        public ActionResult<TaxIdResponse> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
+        public async Task<ActionResult<TaxIdResponse>> RegisterBusiness(RegisterBusinessRequest registerBusinessRequest)
         {
+            var latestSimulation = _unitOfWork.SimulationRepository.GetLatestSimulation();
+
+            if (latestSimulation == null)
+            {
+                return StatusCode(StatusCodes.Status416RangeNotSatisfiable, "Waiting for simulatin to start");
+            }
+
+            var taxPayer = await _unitOfWork.TaxPayerRepository.GetByName(registerBusinessRequest.BusinessName);
+
+            if (taxPayer == null)
+            {
+                var newTaxPayer = new TaxPayer
+                {
+                    Name = registerBusinessRequest.BusinessName,
+                    Group = (int)Data.TaxPayerType.BUSINESS,
+                    Status = (int)Data.TaxStatus.ACTIVE,
+                    AmountOwing = 0,
+                    SimulationId = latestSimulation.Id
+                };
+
+                _unitOfWork.TaxPayerRepository.Create(newTaxPayer);
+                _unitOfWork.Save();
+
+                return Ok(
+                    new TaxIdResponse
+                    {
+                        TaxId = newTaxPayer.TaxPayerId
+                    }
+               );
+            }
+
             return Ok(
                 new TaxIdResponse
                 {
-                    TaxId = Guid.NewGuid()
+                    TaxId = taxPayer.TaxPayerId
                 }
-           );
+            );
         }
 
         // GET: api/taxPayer/getTaxStatement
         [SwaggerOperation(Summary = "Gets the tax statment for a tax payer")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TaxStatementResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError)]
         [HttpGet("getTaxStatement/{taxId}")]
-        public ActionResult<TaxStatementResponse> GetTaxStatement(Guid taxId)
+        public async Task<ActionResult<TaxStatementResponse>> GetTaxStatement(Guid taxId)
         {
-            return Ok(
-                new TaxStatementResponse
+            try
+            {
+                var taxpayer = await _unitOfWork.TaxPayerRepository.GetByUUID(taxId);
+
+                if (taxpayer != null)
                 {
-                    AmountOwing = 0
+                    return Ok(
+                        new TaxStatementResponse
+                        {
+                            AmountOwing = taxpayer.AmountOwing
+                        }
+                    );
+
                 }
-            );
+                else
+                {
+                    return NotFound("Taxpayer not found");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error getting taxpayer: " + ex.Message);
+            }
         }
     }
 }

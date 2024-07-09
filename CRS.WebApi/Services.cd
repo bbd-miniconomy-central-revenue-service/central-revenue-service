@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BackgroundWorker" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAgAAAAAAAAAAIAAAAAAAAAAAEA=</HashCode>
+      <FileName>Services\BackgroundWorker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRS.WebApi.Services.CommercialBankService" Collapsed="true">
+    <Position X="4.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAhAAAAAAAAgAAAAIAAAAAIAAAAE=</HashCode>
+      <FileName>Services\CommercialBankService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRS.WebApi.Services.DefaultScopedProcessingService" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAQAIAAAAAQCAgAAAAAQACEAAIQAAQAgAAAAAAA=</HashCode>
+      <FileName>Services\DefaultScopedProcessingService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CRS.WebApi.Services.HandOfZeusService" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAABAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Services\HandOfZeusService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRS.WebApi.Services.IncomeTaxCalculator" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.5" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAABEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IncomeTaxCalculator.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CRS.WebApi.Services.PropertyTaxCalculator" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAABEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\PropertyTaxCalculator.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="CRS.WebApi.Services.TaxCalculatorFactory" Collapsed="true">
+    <Position X="2.5" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\TaxCalculatorFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRS.WebApi.Services.TaxCalculatorService" Collapsed="true">
+    <Position X="4.75" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\TaxCalculatorService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CRS.WebApi.Services.VatCalculator" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7" Y="1.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAABEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\VatCalculator.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="CRS.WebApi.Services.ICalculator&lt;T, K&gt;" Collapsed="true">
+    <Position X="7" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\ICalculator.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="CRS.WebApi.Services.IScopedProcessingService" Collapsed="true">
+    <Position X="4.75" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IScopedService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

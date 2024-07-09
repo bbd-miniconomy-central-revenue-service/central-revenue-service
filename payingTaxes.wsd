@@ -1,0 +1,51 @@
+@startuml businessService
+
+participant "Business Service" as Business
+participant "Revenue Service" as Revenue
+participant "Commercial Bank Service" as Bank
+participant "Labour Service" as Labour
+
+== Business Tax Payment ==
+
+Business -> Revenue: POST /api/business/register
+Revenue -> Business: 200 OK (taxId: UUID)
+
+Business -> Revenue: POST /api/taxpayment/createTaxInvoice (taxId: UUID)
+Revenue -> Business: 200 OK (taxAmount, paymentId)
+
+Business -> Bank: POST /api/payment (taxId, paymentId, taxAmount)
+Bank -> Business: 200 OK
+
+Business -> Revenue: POST /api/taxpayment/submitNoticeOfPayment (taxId, paymentId, callbackUrl)
+
+Revenue -> Bank: GET /transactions (taxId, paymentId)
+Bank -> Revenue: 200 OK (transaction details)
+
+alt Payment Verified
+    Revenue -> Business: POST callbackUrl (status: success)
+else Payment Not Verified
+    Revenue -> Business: POST callbackUrl (status: failure)
+end
+
+== Labour Service Tax Payment ==
+Labour -> Revenue: GET /api/taxpayer/getTaxId/{personaId}
+Revenue -> Labour: 200 OK (taxId: UUID)
+
+Labour -> Revenue: POST /api/taxpayment/createTaxInvoice (taxId: UUID)
+Revenue -> Labour: 200 OK (taxAmount, paymentId)
+
+Labour -> Bank: POST /api/payment (taxId, paymentId, taxAmount)
+Bank -> Labour: 200 OK
+
+Labour -> Revenue: POST /api/taxpayment/submitNoticeOfPayment (taxId, paymentId, callbackUrl)
+
+Revenue -> Bank: GET /transactions (taxId, paymentId)
+Bank -> Revenue: 200 OK (transaction details)
+
+alt Payment Verified
+    Revenue -> Labour: POST callbackUrl (status: success)
+else Payment Not Verified
+    Revenue -> Labour: POST callbackUrl (status: failure)
+end
+
+@enduml

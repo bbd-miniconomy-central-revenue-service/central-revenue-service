@@ -4,21 +4,13 @@ using System.Linq.Expressions;
 
 namespace CRS.WebApi.Repositories;
 
-public abstract class GenericRepository<T, K> : IRepository<T, K> where T : class
+public abstract class GenericRepository<T, K>(
+    CrsdbContext context) : IRepository<T, K> where T : class
 {   
-    protected CrsdbContext _context;
-    internal DbSet<T> dbSet;
-    public readonly ILogger _logger;
+    protected CrsdbContext _context = context;
+    internal DbSet<T> dbSet = context.Set<T>();
 
-    public GenericRepository(
-        CrsdbContext context, ILogger logger)
-    {
-        _context = context;
-        this.dbSet = context.Set<T>();
-        _logger = logger;
-    }
-
-   public virtual async Task<IEnumerable<T>> All() => await dbSet.ToListAsync();
+    public virtual IEnumerable<T> All() => [.. dbSet];
 
    public virtual async void Create(T entity)
     {
@@ -36,11 +28,16 @@ public abstract class GenericRepository<T, K> : IRepository<T, K> where T : clas
 
     public virtual async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate) => await dbSet.Where(predicate).ToListAsync();
 
-    public async Task<T?> GetById(K id) => await dbSet.FindAsync(id);
+    public T? GetById(K id) => dbSet.Find(id);
 
     public virtual void Update(T entity)
     {
         dbSet.Attach(entity);
         _context.Entry(entity).State = EntityState.Modified;
+    }
+
+    public virtual void DeleteAll()
+    {
+        throw new NotImplementedException();
     }
 }
